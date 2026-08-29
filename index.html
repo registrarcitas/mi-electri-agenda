@@ -252,6 +252,75 @@ body{
 <p>Agenda · Presupuestos · Cobros</p>
 </header>
 
+  <!-- =====================
+     AGENDA
+===================== -->
+
+<section id="agenda" class="hidden">
+
+  <button class="gray back" onclick="mostrar('inicio')">
+    ← Regresar
+  </button>
+
+  <div class="card">
+
+    <h2>📅 Agenda</h2>
+
+    <p>
+      Programa tus trabajos y visitas.
+    </p>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>➕ Nuevo trabajo</h2>
+
+    <select id="agendaCliente">
+
+      <option value="">
+        Seleccionar cliente
+      </option>
+
+    </select>
+
+
+    <input
+      id="agendaFecha"
+      type="date">
+
+
+    <input
+      id="agendaHora"
+      type="time">
+
+
+    <input
+      id="agendaTrabajo"
+      placeholder="Trabajo a realizar">
+
+
+    <textarea
+      id="agendaNotas"
+      placeholder="Notas del trabajo"></textarea>
+
+
+    <button
+      class="primary full"
+      onclick="guardarTrabajo()">
+
+      💾 Guardar trabajo
+
+    </button>
+
+  </div>
+
+
+  <div id="listaAgenda"></div>
+
+</section>
+  
 <main>
 
 <!-- INICIO -->
@@ -280,14 +349,15 @@ body{
 📦<br>Materiales
 </button>
 
-<button onclick="alert('La agenda será agregada en la siguiente versión.')">
-📅<br>Agenda
+<button onclick="mostrar('agenda')">
+  📅<br>Agenda
 </button>
+
 
 <button onclick="alert('El módulo de cobros será agregado próximamente.')">
 💰<br>Cobros
 </button>
-
+  
 </div>
 
 </section>
