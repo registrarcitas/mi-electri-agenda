@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+<title>Mi Electri-Agenda</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#f1f5f9;
+  color:#0f172a;
+  min-height:100vh;
+}
+
+header{
+  background:#0f172a;
+  color:white;
+  padding:20px;
+  text-align:center;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+header h1{
+  font-size:24px;
+}
+
+header p{
+  color:#cbd5e1;
+  font-size:13px;
+  margin-top:5px;
+}
+
+main{
+  max-width:650px;
+  margin:auto;
+  padding:16px;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.card{
+  background:white;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 2px 8px #0001;
+}
+
+h2{
+  font-size:19px;
+  margin-bottom:14px;
+}
+
+h3{
+  margin-bottom:6px;
+}
+
+input,select{
+  width:100%;
+  padding:13px;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  font-size:16px;
+  margin-bottom:10px;
+  background:white;
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:12px 15px;
+  font-weight:bold;
+  font-size:15px;
+  cursor:pointer;
+}
+
+.primary{
+  background:#2563eb;
+  color:white;
+}
+
+.success{
+  background:#16a34a;
+  color:white;
+}
+
+.dark{
+  background:#0f172a;
+  color:white;
+}
+
+.danger{
+  background:#dc2626;
+  color:white;
+}
+
+.gray{
+  background:#e2e8f0;
+  color:#0f172a;
+}
+
+.full{
+  width:100%;
+  margin-top:8px;
+}
+
+.menu{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.menu button{
+  min-height:80px;
+  font-size:16px;
+  background:white;
+  box-shadow:0 2px 8px #0001;
+}
+
+.total{
+  background:#facc15;
+  border-radius:18px;
+  padding:20px;
+  text-align:center;
+  margin-bottom:14px;
+}
+
+.total small{
+  color:#713f12;
+}
+
+.total strong{
+  display:block;
+  font-size:34px;
+  margin-top:5px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.item{
+  border-bottom:1px solid #e2e8f0;
+  padding:12px 0;
+}
+
+.item:last-child{
+  border-bottom:0;
+}
+
+.item small{
+  color:#64748b;
+}
+
+.price{
+  font-weight:bold;
+  color:#166534;
+}
+
+.actions{
+  display:flex;
+  gap:7px;
+  margin-top:8px;
+  flex-wrap:wrap;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 8px;
+  background:#dbeafe;
+  color:#1e40af;
+  border-radius:8px;
+  font-size:12px;
+}
+
+.big{
+  font-size:24px;
+  font-weight:bold;
+}
+
+.empty{
+  text-align:center;
+  color:#64748b;
+  padding:20px;
+}
+
+.back{
+  margin-bottom:12px;
+}
+
+.summary{
+  border-top:2px solid #e2e8f0;
+  margin-top:12px;
+  padding-top:12px;
+}
+
+.summary div{
+  display:flex;
+  justify-content:space-between;
+  padding:7px 0;
+}
+
+.final{
+  font-size:22px;
+  font-weight:bold;
+}
+
+nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:white;
+  border-top:1px solid #cbd5e1;
+  display:flex;
+  justify-content:space-around;
+  padding:8px 4px;
+  z-index:20;
+}
+
+nav button{
+  background:none;
+  padding:6px;
+  font-size:12px;
+}
+
+body{
+  padding-bottom:70px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>⚡ Mi Electri-Agenda</h1>
+<p>Agenda · Presupuestos · Cobros</p>
+</header>
+
+<main>
+
+<!-- INICIO -->
+<section id="inicio">
+
+<div class="card">
+<h2>Buenos días 👋</h2>
+<p>¿Qué quieres hacer?</p>
+</div>
+
+<div class="menu">
+
+<button onclick="mostrar('cotizador')">
+🧾<br>Nuevo<br>presupuesto
+</button>
+
+<button onclick="mostrar('clientes')">
+👥<br>Clientes
+</button>
+
+<button onclick="mostrar('servicios')">
+🔧<br>Servicios
+</button>
+
+<button onclick="mostrar('materiales')">
+📦<br>Materiales
+</button>
+
+<button onclick="alert('La agenda será agregada en la siguiente versión.')">
+📅<br>Agenda
+</button>
+
+<button onclick="alert('El módulo de cobros será agregado próximamente.')">
+💰<br>Cobros
+</button>
+
+</div>
+
+</section>
+
+
+<!-- CLIENTES -->
+<section id="clientes" class="hidden">
+
+<button class="gray back" onclick="mostrar('inicio')">
+← Regresar
+</button>
+
+<div class="card">
+
+<h2>👥 Clientes</h2>
+
+<button class="primary full" onclick="nuevoCliente()">
++ Nuevo cliente
+</button>
+
+</div>
+
+<div id="listaClientes"></div>
+
+</section>
+
+
+<!-- SERVICIOS -->
+<section id="servicios" class="hidden">
+
+<button class="gray back" onclick="mostrar('inicio')">
+← Regresar
+</button>
+
+<div class="card">
+
+<h2>🔧 Servicios</h2>
+
+<input id="servNombre" placeholder="Nombre del servicio">
+
+<input id="servPrecio"
+type="number"
+placeholder="Precio de mano de obra">
+
+<button class="success full" onclick="agregarServicio()">
++ Agregar servicio
+</button>
+
+</div>
+
+<div id="listaServicios"></div>
+
+</section>
+
+
+<!-- MATERIALES -->
+<section id="materiales" class="hidden">
+
+<button class="gray back" onclick="mostrar('inicio')">
+← Regresar
+</button>
+
+<div class="card">
+
+<h2>📦 Materiales</h2>
+
+<input id="matNombre"
+placeholder="Nombre del material">
+
+<input id="matCosto"
+type="number"
+placeholder="Costo de compra">
+
+<input id="matMargen"
+type="number"
+value="20"
+placeholder="Margen %">
+
+<button class="success full" onclick="agregarMaterialCatalogo()">
++ Agregar material
+</button>
+
+</div>
+
+<div id="listaMateriales"></div>
+
+</section>
+
+
+<!-- COTIZADOR -->
+<section id="cotizador" class="hidden">
+
+<button class="gray back" onclick="mostrar('inicio')">
+← Regresar
+</button>
+
+<div class="total">
+
+<small>TOTAL DEL PRESUPUESTO</small>
+
+<strong id="total">$0.00</strong>
+
+</div>
+
+
+<div class="card">
+
+<h2>👤 Cliente</h2>
+
+<select id="clienteSeleccionado"
+onchange="cargarClienteCotizacion()">
+
+<option value="">
+Seleccionar cliente
+</option>
+
+</select>
+
+<div id="datosCliente"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>🔧 Agregar servicio</h2>
+
+<select id="servicioSeleccionado">
+<option value="">Seleccionar servicio</option>
+</select>
+
+<input id="cantidadServicio"
+type="number"
+value="1"
+min="1"
+placeholder="Cantidad">
+
+<button class="primary full"
+onclick="agregarServicioCotizacion()">
+
++ Agregar servicio
+
+</button>
+
+</div>
+
+
+<div class="card">
+
+<h2>📦 Agregar material</h2>
+
+<select id="materialSeleccionado">
+
+<option value="">
+Seleccionar material
+</option>
+
+</select>
+
+<input id="cantidadMaterial"
+type="number"
+value="1"
+min="1"
+placeholder="Cantidad">
+
+<button class="primary full"
+onclick="agregarMaterialCotizacion()">
+
++ Agregar material
+
+</button>
+
+</div>
+
+
+<div class="card">
+
+<h2>🧾 Conceptos</h2>
+
+<div id="conceptos">
+
+<div class="empty">
+No hay conceptos agregados.
+</div>
+
+</div>
+
+<div class="summary">
+
+<div>
+<span>Mano de obra</span>
+<strong id="subtotalServicios">$0.00</strong>
+</div>
+
+<div>
+<span>Materiales</span>
+<strong id="subtotalMateriales">$0.00</strong>
+</div>
+
+<div class="final">
+<span>TOTAL</span>
+<strong id="totalFinal">$0.00</strong>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>💰 Pago</h2>
+
+<input
+id="anticipo"
+type="number"
+placeholder="Anticipo">
+
+<div class="summary">
+
+<div class="final">
+<span>Saldo</span>
+<strong id="saldo">$0.00</strong>
+</div>
+
+</div>
+
+</div>
+
+
+<button class="success full"
+onclick="guardarPresupuesto()">
+
+💾 Guardar presupuesto
+
+</button>
+
+<button class="dark full"
+onclick="compartirWhatsApp()">
+
+📲 Compartir por WhatsApp
+
+</button>
+
+</section>
+
+</main>
+
+
+<nav>
+
+<button onclick="mostrar('inicio')">
+🏠<br>Inicio
+</button>
+
+<button onclick="mostrar('clientes')">
+👥<br>Clientes
+</button>
+
+<button onclick="mostrar('cotizador')">
+🧾<br>Cotizar
+</button>
+
+<button onclick="mostrar('servicios')">
+🔧<br>Servicios
+</button>
+
+</nav>
+
+
+<script>
+
+let clientes =
+JSON.parse(localStorage.getItem("clientes") || "[]");
+
+let servicios =
+JSON.parse(localStorage.getItem("servicios") || "[]");
+
+let materiales =
+JSON.parse(localStorage.getItem("materiales") || "[]");
+
+let conceptos = [];
+
+
+/* DATOS INICIALES */
+
+if(servicios.length === 0){
+
+servicios = [
+
+{
+id:Date.now()+1,
+nombre:"Contacto",
+precio:250
+},
+
+{
+id:Date.now()+2,
+nombre:"Apagador",
+precio:250
+},
+
+{
+id:Date.now()+3,
+nombre:"Lámpara",
+precio:450
+},
+
+{
+id:Date.now()+4,
+nombre:"Circuito 120 V",
+precio:1500
+},
+
+{
+id:Date.now()+5,
+nombre:"Circuito 220 V",
+precio:2000
+},
+
+{
+id:Date.now()+6,
+nombre:"Diagnóstico",
+precio:500
+}
+
+];
+
+guardarDatos();
+
+}
+
+
+/* NAVEGACIÓN */
+
+function mostrar(id){
+
+document
+.querySelectorAll("main > section")
+.forEach(s=>s.classList.add("hidden"));
+
+document
+.getElementById(id)
+.classList.remove("hidden");
+
+if(id==="clientes")
+mostrarClientes();
+
+if(id==="servicios")
+mostrarServicios();
+
+if(id==="materiales")
+mostrarMateriales();
+
+if(id==="cotizador")
+prepararCotizador();
+
+window.scrollTo(0,0);
+
+}
+
+
+/* GUARDAR */
+
+function guardarDatos(){
+
+localStorage.setItem(
+"clientes",
+JSON.stringify(clientes)
+);
+
+localStorage.setItem(
+"servicios",
+JSON.stringify(servicios)
+);
+
+localStorage.setItem(
+"materiales",
+JSON.stringify(materiales)
+);
+
+}
+
+
+/* CLIENTES */
+
+function nuevoCliente(){
+
+const nombre =
+prompt("Nombre del cliente:");
+
+if(!nombre)return;
+
+const telefono =
+prompt("Teléfono:");
+
+const domicilio =
+prompt("Domicilio:");
+
+const referencias =
+prompt("Referencias:");
+
+clientes.push({
+
+id:Date.now(),
+
+nombre,
+
+telefono,
+
+domicilio,
+
+referencias
+
+});
+
+guardarDatos();
+
+mostrarClientes();
+
+}
+
+
+function mostrarClientes(){
+
+const cont =
+document.getElementById("listaClientes");
+
+if(clientes.length===0){
+
+cont.innerHTML=
+'<div class="card empty">No tienes clientes todavía.</div>';
+
+return;
+
+}
+
+cont.innerHTML="";
+
+clientes.forEach(c=>{
+
+const div =
+document.createElement("div");
+
+div.className="card";
+
+div.innerHTML=`
+
+<h3>${escapeHTML(c.nombre)}</h3>
+
+<p>📞 ${escapeHTML(c.telefono || "")}</p>
+
+<p>📍 ${escapeHTML(c.domicilio || "")}</p>
+
+${c.referencias ?
+`<p>📝 ${escapeHTML(c.referencias)}</p>`:""}
+
+<div class="actions">
+
+<button class="primary"
+onclick="editarCliente(${c.id})">
+Editar
+</button>
+
+<button class="danger"
+onclick="eliminarCliente(${c.id})">
+Eliminar
+</button>
+
+<button class="dark"
+onclick="abrirMaps('${encodeURIComponent(c.domicilio || "")}')">
+🗺️ Maps
+</button>
+
+<button class="dark"
+onclick="abrirWaze('${encodeURIComponent(c.domicilio || "")}')">
+🚗 Waze
+</button>
+
+</div>
+
+`;
+
+cont.appendChild(div);
+
+});
+
+}
+
+
+function editarCliente(id){
+
+const c =
+clientes.find(x=>x.id===id);
+
+if(!c)return;
+
+const nombre =
+prompt("Nombre:",c.nombre);
+
+if(!nombre)return;
+
+c.nombre=nombre;
+
+c.telefono =
+prompt("Teléfono:",c.telefono || "");
+
+c.domicilio =
+prompt("Domicilio:",c.domicilio || "");
+
+c.referencias =
+prompt("Referencias:",c.referencias || "");
+
+guardarDatos();
+
+mostrarClientes();
+
+}
+
+
+function eliminarCliente(id){
+
+if(!confirm("¿Eliminar este cliente?"))return;
+
+clientes =
+clientes.filter(c=>c.id!==id);
+
+guardarDatos();
+
+mostrarClientes();
+
+}
+
+
+/* SERVICIOS */
+
+function agregarServicio(){
+
+const nombre =
+document.getElementById("servNombre").value.trim();
+
+const precio =
+parseFloat(document.getElementById("servPrecio").value);
+
+if(!nombre || !precio){
+
+alert("Escribe nombre y precio.");
+
+return;
+
+}
+
+servicios.push({
+
+id:Date.now(),
+
+nombre,
+
+precio
+
+});
+
+guardarDatos();
+
+document.getElementById("servNombre").value="";
+
+document.getElementById("servPrecio").value="";
+
+mostrarServicios();
+
+}
+
+
+function mostrarServicios(){
+
+const cont =
+document.getElementById("listaServicios");
+
+if(servicios.length===0){
+
+cont.innerHTML=
+'<div class="card empty">No hay servicios.</div>';
+
+return;
+
+}
+
+cont.innerHTML="";
+
+servicios.forEach(s=>{
+
+const div =
+document.createElement("div");
+
+div.className="card";
+
+div.innerHTML=`
+
+<div class="row">
+
+<div>
+
+<h3>${escapeHTML(s.nombre)}</h3>
+
+<span class="badge">
+Mano de obra
+</span>
+
+</div>
+
+<div class="price">
+$${s.precio.toFixed(2)}
+</div>
+
+</div>
+
+<div class="actions">
+
+<button class="danger"
+onclick="eliminarServicio(${s.id})">
+Eliminar
+</button>
+
+</div>
+
+`;
+
+cont.appendChild(div);
+
+});
+
+}
+
+
+function eliminarServicio(id){
+
+servicios =
+servicios.filter(s=>s.id!==id);
+
+guardarDatos();
+
+mostrarServicios();
+
+}
+
+
+/* MATERIALES */
+
+function agregarMaterialCatalogo(){
+
+const nombre =
+document.getElementById("matNombre").value.trim();
+
+const costo =
+parseFloat(document.getElementById("matCosto").value);
+
+const margen =
+parseFloat(document.getElementById("matMargen").value) || 0;
+
+if(!nombre || !costo){
+
+alert("Escribe nombre y costo.");
+
+return;
+
+}
+
+const precio =
+costo * (1 + margen/100);
+
+materiales.push({
+
+id:Date.now(),
+
+nombre,
+
+costo,
+
+margen,
+
+precio
+
+});
+
+guardarDatos();
+
+document.getElementById("matNombre").value="";
+
+document.getElementById("matCosto").value="";
+
+mostrarMateriales();
+
+}
+
+
+function mostrarMateriales(){
+
+const cont =
+document.getElementById("listaMateriales");
+
+if(materiales.length===0){
+
+cont.innerHTML=
+'<div class="card empty">No hay materiales.</div>';
+
+return;
+
+}
+
+cont.innerHTML="";
+
+materiales.forEach(m=>{
+
+const div =
+document.createElement("div");
+
+div.className="card";
+
+div.innerHTML=`
+
+<div class="row">
+
+<div>
+
+<h3>${escapeHTML(m.nombre)}</h3>
+
+<small>
+Costo: $${m.costo.toFixed(2)}
+· Margen: ${m.margen}%
+</small>
+
+</div>
+
+<div class="price">
+$${m.precio.toFixed(2)}
+</div>
+
+</div>
+
+<div class="actions">
+
+<button class="danger"
+onclick="eliminarMaterial(${m.id})">
+Eliminar
+</button>
+
+</div>
+
+`;
+
+cont.appendChild(div);
+
+});
+
+}
+
+
+function eliminarMaterial(id){
+
+materiales =
+materiales.filter(m=>m.id!==id);
+
+guardarDatos();
+
+mostrarMateriales();
+
+}
+
+
+/* COTIZADOR */
+
+function prepararCotizador(){
+
+const selectCliente =
+document.getElementById("clienteSeleccionado");
+
+selectCliente.innerHTML =
+'<option value="">Seleccionar cliente</option>';
+
+clientes.forEach(c=>{
+
+selectCliente.innerHTML += `
+
+<option value="${c.id}">
+${escapeHTML(c.nombre)}
+</option>
+
+`;
+
+});
+
+
+const selectServicio =
+document.getElementById("servicioSeleccionado");
+
+selectServicio.innerHTML =
+'<option value="">Seleccionar servicio</option>';
+
+servicios.forEach(s=>{
+
+selectServicio.innerHTML += `
+
+<option value="${s.id}">
+${escapeHTML(s.nombre)} - $${s.precio.toFixed(2)}
+</option>
+
+`;
+
+});
+
+
+const selectMaterial =
+document.getElementById("materialSeleccionado");
+
+selectMaterial.innerHTML =
+'<option value="">Seleccionar material</option>';
+
+materiales.forEach(m=>{
+
+selectMaterial.innerHTML += `
+
+<option value="${m.id}">
+${escapeHTML(m.nombre)} - $${m.precio.toFixed(2)}
+</option>
+
+`;
+
+});
+
+}
+
+
+function cargarClienteCotizacion(){
+
+const id =
+parseInt(
+document.getElementById("clienteSeleccionado").value
+);
+
+const c =
+clientes.find(x=>x.id===id);
+
+const div =
+document.getElementById("datosCliente");
+
+if(!c){
+
+div.innerHTML="";
+
+return;
+
+}
+
+div.innerHTML=`
+
+<div class="card">
+
+<strong>${escapeHTML(c.nombre)}</strong>
+
+<p>📞 ${escapeHTML(c.telefono || "")}</p>
+
+<p>📍 ${escapeHTML(c.domicilio || "")}</p>
+
+<div class="actions">
+
+<button class="dark"
+onclick="abrirMaps('${encodeURIComponent(c.domicilio || "")}')">
+🗺️ Maps
+</button>
+
+<button class="dark"
+onclick="abrirWaze('${encodeURIComponent(c.domicilio || "")}')">
+🚗 Waze
+</button>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+function agregarServicioCotizacion(){
+
+const id =
+parseInt(
+document.getElementById("servicioSeleccionado").value
+);
+
+const cantidad =
+parseInt(
+document.getElementById("cantidadServicio").value
+) || 1;
+
+const s =
+servicios.find(x=>x.id===id);
+
+if(!s){
+
+alert("Selecciona un servicio.");
+
+return;
+
+}
+
+conceptos.push({
+
+tipo:"servicio",
+
+nombre:s.nombre,
+
+precio:s.precio,
+
+cantidad
+
+});
+
+actualizarCotizacion();
+
+}
+
+
+function agregarMaterialCotizacion(){
+
+const id =
+parseInt(
+document.getElementById("materialSeleccionado").value
+);
+
+const cantidad =
+parseInt(
+document.getElementById("cantidadMaterial").value
+) || 1;
+
+const m =
+materiales.find(x=>x.id===id);
+
+if(!m){
+
+alert("Selecciona un material.");
+
+return;
+
+}
+
+conceptos.push({
+
+tipo:"material",
+
+nombre:m.nombre,
+
+precio:m.precio,
+
+cantidad
+
+});
+
+actualizarCotizacion();
+
+}
+
+
+function actualizarCotizacion(){
+
+const cont =
+document.getElementById("conceptos");
+
+let manoObra=0;
+
+let totalMateriales=0;
+
+if(conceptos.length===0){
+
+cont.innerHTML=
+'<div class="empty">No hay conceptos agregados.</div>';
+
+}else{
+
+cont.innerHTML="";
+
+conceptos.forEach((c,index)=>{
+
+const subtotal =
+c.precio*c.cantidad;
+
+if(c.tipo==="servicio")
+manoObra+=subtotal;
+
+else
+totalMateriales+=subtotal;
+
+const div =
+document.createElement("div");
+
+div.className="item";
+
+div.innerHTML=`
+
+<div class="row">
+
+<div>
+
+<strong>${escapeHTML(c.nombre)}</strong>
+
+<br>
+
+<small>
+${c.cantidad} × $${c.precio.toFixed(2)}
+</small>
+
+</div>
+
+<strong>
+$${subtotal.toFixed(2)}
+</strong>
+
+</div>
+
+<button class="danger"
+onclick="eliminarConcepto(${index})">
+Eliminar
+</button>
+
+`;
+
+cont.appendChild(div);
+
+});
+
+}
+
+const total =
+manoObra+totalMateriales;
+
+document.getElementById("subtotalServicios")
+.textContent="$"+manoObra.toFixed(2);
+
+document.getElementById("subtotalMateriales")
+.textContent="$"+totalMateriales.toFixed(2);
+
+document.getElementById("total")
+.textContent="$"+total.toFixed(2);
+
+document.getElementById("totalFinal")
+.textContent="$"+total.toFixed(2);
+
+calcularSaldo();
+
+}
+
+
+function eliminarConcepto(index){
+
+conceptos.splice(index,1);
+
+actualizarCotizacion();
+
+}
+
+
+function calcularSaldo(){
+
+const total =
+conceptos.reduce(
+(sum,c)=>sum+(c.precio*c.cantidad),
+0
+);
+
+const anticipo =
+parseFloat(
+document.getElementById("anticipo").value
+) || 0;
+
+const saldo =
+Math.max(total-anticipo,0);
+
+document.getElementById("saldo")
+.textContent="$"+saldo.toFixed(2);
+
+}
+
+
+document
+.getElementById("anticipo")
+.addEventListener(
+"input",
+calcularSaldo
+);
+
+
+/* PRESUPUESTO */
+
+function guardarPresupuesto(){
+
+const clienteId =
+parseInt(
+document.getElementById("clienteSeleccionado").value
+);
+
+if(!clienteId){
+
+alert("Selecciona un cliente.");
+
+return;
+
+}
+
+if(conceptos.length===0){
+
+alert("Agrega al menos un concepto.");
+
+return;
+
+}
+
+const anticipo =
+parseFloat(
+document.getElementById("anticipo").value
+) || 0;
+
+const total =
+conceptos.reduce(
+(sum,c)=>sum+(c.precio*c.cantidad),
+0
+);
+
+const presupuesto={
+
+id:Date.now(),
+
+clienteId,
+
+conceptos:[...conceptos],
+
+total,
+
+anticipo,
+
+saldo:Math.max(total-anticipo,0),
+
+fecha:new Date().toLocaleString()
+
+};
+
+const presupuestos =
+JSON.parse(
+localStorage.getItem("presupuestos") || "[]"
+);
+
+presupuestos.push(presupuesto);
+
+localStorage.setItem(
+"presupuestos",
+JSON.stringify(presupuestos)
+);
+
+alert("✅ Presupuesto guardado.");
+
+}
+
+
+function compartirWhatsApp(){
+
+const clienteId =
+parseInt(
+document.getElementById("clienteSeleccionado").value
+);
+
+const cliente =
+clientes.find(c=>c.id===clienteId);
+
+if(!cliente){
+
+alert("Selecciona un cliente.");
+
+return;
+
+}
+
+const total =
+document.getElementById("totalFinal").textContent;
+
+let mensaje =
+"⚡ Mi Electri-Agenda\n\n";
+
+mensaje +=
+"Presupuesto para: "+
+cliente.nombre+
+"\n\n";
+
+conceptos.forEach(c=>{
+
+mensaje +=
+c.nombre+
+" x "+
+c.cantidad+
+" = $"+
+(c.precio*c.cantidad).toFixed(2)+
+"\n";
+
+});
+
+mensaje +=
+"\nTOTAL: "+
+total+
+"\n";
+
+const url =
+"https://wa.me/?text="+
+encodeURIComponent(mensaje);
+
+window.open(url,"_blank");
+
+}
+
+
+/* MAPS / WAZE */
+
+function abrirMaps(direccion){
+
+const url =
+"https://www.google.com/maps/search/?api=1&query="+
+direccion;
+
+window.open(url,"_blank");
+
+}
+
+
+function abrirWaze(direccion){
+
+const url =
+"https://www.waze.com/ul?q="+
+direccion+
+"&navigate=yes";
+
+window.open(url,"_blank");
+
+}
+
+
+/* SEGURIDAD BÁSICA */
+
+function escapeHTML(text){
+
+return String(text || "")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+
+}
+
+
+/* INICIALIZAR */
+
+mostrar("inicio");
+
+</script>
+
+</body>
+</html>
