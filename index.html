@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Electri-Agenda</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --dark: #1e293b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding-bottom: 70px;
+    }
+
+    header {
+      background: var(--dark);
+      color: white;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      z-index: 1000;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      padding: 10px 4px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.7rem;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    nav button span {
+      font-size: 1.2rem;
+      margin-bottom: 2px;
+    }
+
+    main {
+      padding: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    section {
+      display: block;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: #475569;
+      margin-top: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button.btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .actions button {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button.primary { background: var(--primary); color: white; }
+    button.success { background: var(--success); color: white; }
+    button.danger { background: var(--danger); color: white; }
+    button.dark { background: var(--dark); color: white; }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .price {
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      background: #e2e8f0;
+    }
+
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-yellow { background: #fef9c3; color: #a16207; }
+    .badge-red { background: #fee2e2; color: #b91c1c; }
+
+    .cobro-card { border-left: 5px solid #cbd5e1; }
+    .cobro-pendiente { border-left-color: var(--danger); }
+    .cobro-parcial { border-left-color: #eab308; }
+    .cobro-pagado { border-left-color: var(--success); }
+
+    .info-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-top: 8px;
+    }
+
+    .stock-box {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      background: #f1f5f9;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+
+    .empty {
+      text-align: center;
+      color: #94a3b8;
+      padding: 20px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 10px 0;
+    }
+
+    .total-box {
+      background: #f1f5f9;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>⚡ Mi Electri-Agenda</h1>
+  </header>
+
+  <main>
+    <!-- INICIO -->
+    <section id="inicio">
+      <div class="card">
+        <h2>Panel Principal</h2>
+        <p>Selecciona una opción en el menú inferior para gestionar tus clientes, realizar cotizaciones, organizar tu agenda o revisar tus cobros.</p>
+      </div>
+      <div class="card">
+        <h3>Accesos Rápidos</h3>
+        <div class="btn-group" style="margin-top:10px;">
+          <button class="btn primary" onclick="mostrar('cotizador')">➕ Nueva Cotización</button>
+          <button class="btn success" onclick="mostrar('agenda')">📅 Ver Agenda</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLIENTES -->
+    <section id="clientes" class="hidden">
+      <div class="card">
+        <div class="row">
+          <h2>Clientes</h2>
+          <button class="primary actions" style="margin:0;" onclick="nuevoCliente()">+ Agregar</button>
+        </div>
+      </div>
+      <div id="listaClientes"></div>
+    </section>
+
+    <!-- SERVICIOS -->
+    <section id="servicios" class="hidden">
+      <div class="card">
+        <h2>Nuevo Servicio (Mano de Obra)</h2>
+        <div class="form-group">
+          <label>Nombre del Servicio</label>
+          <input type="text" id="servNombre" placeholder="Ej. Instalación de Socket">
+        </div>
+        <div class="form-group">
+          <label>Precio Standard ($)</label>
+          <input type="number" id="servPrecio" placeholder="0.00">
+        </div>
+        <button class="btn primary" onclick="agregarServicio()">Guardar Servicio</button>
+      </div>
+      <div id="listaServicios"></div>
+    </section>
+
+    <!-- MATERIALES -->
+    <section id="materiales" class="hidden">
+      <div class="card">
+        <h2>Catálogo de Materiales</h2>
+        <div class="form-group">
+          <label>Nombre del Material</label>
+          <input type="text" id="matNombre" placeholder="Ej. Cable Calibre 12 THHN">
+        </div>
+        <div class="form-group">
+          <label>Unidad de Medida</label>
+          <select id="matUnidad">
+            <option value="metro">Metro</option>
+            <option value="pieza">Pieza</option>
+            <option value="caja">Caja</option>
+            <option value="rollo">Rollo</option>
+            <option value="litro">Litro</option>
+            <option value="kilogramo">Kg</option>
+            <option value="paquete">Paquete</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Contenido por Presentación</label>
+          <input type="number" id="matContenido" value="1" placeholder="Ej. 100 si el rollo trae 100m">
+        </div>
+        <div class="form-group">
+          <label>Costo de Compra ($)</label>
+          <input type="number" id="matCosto" placeholder="Costo total de la presentación">
+        </div>
+        <div class="form-group">
+          <label>Margen de Ganancia (%)</label>
+          <input type="number" id="matMargen" value="20">
+        </div>
+        <div class="form-group">
+          <label>Existencia Inicial (Inventario)</label>
+          <input type="number" id="matStock" placeholder="0">
+        </div>
+        <button class="btn primary" onclick="agregarMaterialCatalogo()">Guardar Material</button>
+      </div>
+      <div id="listaMateriales"></div>
+    </section>
+
+    <!-- COTIZADOR -->
+    <section id="cotizador" class="hidden">
+      <div class="card">
+        <h2>Cotizador</h2>
+        <div class="form-group">
+          <label>Cliente</label>
+          <select id="clienteSeleccionado" onchange="cargarClienteCotizacion()"></select>
+        </div>
+        <div id="datosCliente"></div>
+      </div>
+
+      <div class="card">
+        <h3>Agregar Mano de Obra</h3>
+        <div class="form-group">
+          <select id="servicioSeleccionado"></select>
+        </div>
+        <div class="form-group">
+          <label>Cantidad / Horas</label>
+          <input type="number" id="cantidadServicio" value="1">
+        </div>
+        <button class="btn primary" onclick="agregarServicioCotizacion()">+ Agregar Servicio</button>
+      </div>
+
+      <div class="card">
+        <h3>Agregar Material</h3>
+        <div class="form-group">
+          <select id="materialSeleccionado" onchange="mostrarInfoMaterialCotizacion()"></select>
+        </div>
+        <div id="infoMaterialCotizacion"></div>
+        <div class="form-group" style="margin-top:10px;">
+          <label>Cantidad Requerida</label>
+          <input type="number" id="cantidadMaterial" placeholder="0">
+        </div>
+        <button class="btn primary" onclick="agregarMaterialCotizacion()">+ Agregar Material</button>
+      </div>
+
+      <div class="card">
+        <h3>Resumen del Presupuesto</h3>
+        <div id="conceptos" style="margin-top:10px;"></div>
+
+        <div class="total-box">
+          <div class="row"><p>Mano de obra:</p><strong id="subtotalServicios">$0.00</strong></div>
+          <div class="row"><p>Materiales:</p><strong id="subtotalMateriales">$0.00</strong></div>
+          <hr>
+          <div class="row"><h3>Total:</h3><h3 class="price" id="total">$0.00</h3></div>
+        </div>
+
+        <div class="form-group" style="margin-top:12px;">
+          <label>Anticipo recibido ($)</label>
+          <input type="number" id="anticipo" placeholder="0.00">
+        </div>
+
+        <div class="total-box">
+          <div class="row"><p>Total Presupuesto:</p><strong id="totalFinal">$0.00</strong></div>
+          <div class="row"><h3>Saldo Pendiente:</h3><h3 class="price" id="saldo">$0.00</h3></div>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn success" onclick="guardarPresupuesto()">💾 Guardar</button>
+          <button class="btn dark" onclick="compartirWhatsApp()">📲 WhatsApp</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGENDA -->
+    <section id="agenda" class="hidden">
+      <div class="card">
+        <h2>Programar Trabajos</h2>
+        <div class="form-group">
+          <label>Cliente</label>
+          <select id="agendaCliente"></select>
+        </div>
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="date" id="agendaFecha">
+        </div>
+        <div class="form-group">
+          <label>Hora</label>
+          <input type="time" id="agendaHora">
+        </div>
+        <div class="form-group">
+          <label>Trabajo a realizar</label>
+          <input type="text" id="agendaTrabajo" placeholder="Ej. Cambio de centro de carga">
+        </div>
+        <div class="form-group">
+          <label>Notas adicionales</label>
+          <textarea id="agendaNotas" rows="2" placeholder="Detalles de acceso, material a llevar, etc."></textarea>
+        </div>
+        <button class="btn primary" onclick="guardarTrabajo()">Agendar Trabajo</button>
+      </div>
+
+      <div class="card">
+        <h2>Trabajos Pendientes</h2>
+        <div id="listaAgenda"></div>
+      </div>
+    </section>
+
+    <!-- COBROS -->
+    <section id="cobros" class="hidden">
+      <div class="card">
+        <h2>Estado Financiero</h2>
+        <div class="total-box">
+          <div class="row"><p>Total Cobrado:</p><strong id="totalCobrado" style="color:var(--success)">$0.00</strong></div>
+          <div class="row"><p>Por Cobrar:</p><strong id="totalPorCobrar" style="color:var(--danger)">$0.00</strong></div>
+        </div>
+      </div>
+      <div id="listaCobros"></div>
+    </section>
+  </main>
+
+  <nav>
+    <button onclick="mostrar('inicio')"><span>🏠</span>Inicio</button>
+    <button onclick="mostrar('clientes')"><span>👥</span>Clientes</button>
+    <button onclick="mostrar('servicios')"><span>⚡</span>Servicios</button>
+    <button onclick="mostrar('materiales')"><span>📦</span>Materiales</button>
+    <button onclick="mostrar('cotizador')"><span>📝</span>Cotizar</button>
+    <button onclick="mostrar('agenda')"><span>📅</span>Agenda</button>
+    <button onclick="mostrar('cobros')"><span>💰</span>Cobros</button>
+  </nav>
+
+  <!-- Script Lógico Único Externo -->
+  <script src="App.js"></script>
+</body>
+</html>
