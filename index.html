@@ -490,7 +490,14 @@ onclick="guardarTrabajo()">
 
 </div>
 
+<button
+class="danger"
+onclick="eliminarCobro(${p.id})">
 
+🗑️ Eliminar
+
+</button>
+     
 <div id="listaAgenda"></div>
 
 </section>
@@ -942,14 +949,13 @@ onclick="compartirWhatsApp()">
 📲 Compartir por WhatsApp
 
 </button>
-     
-<button
+     <button
 class="danger"
 onclick="eliminarCobro(${p.id})">
 
 🗑️ Eliminar
 
-</button>
+     </button>
      
 </section>
 
@@ -3878,6 +3884,41 @@ alert(
 
 }
 
+function eliminarCobro(id){
+
+    const p = presupuestos.find(
+        x => x.id === id
+    );
+
+    if(!p)return;
+
+    const cliente = clientes.find(
+        c => c.id === p.clienteId
+    );
+
+    const nombreCliente = cliente
+        ? cliente.nombre
+        : "este cliente";
+
+    if(!confirm(
+        "¿Eliminar este cobro?\n\n" +
+        "Cliente: " + nombreCliente + "\n" +
+        "Total: $" + Number(p.total).toFixed(2) +
+        "\n\nEsta acción no se puede deshacer."
+    )){
+        return;
+    }
+
+    presupuestos = presupuestos.filter(
+        x => x.id !== id
+    );
+
+    guardarDatos();
+
+    mostrarCobros();
+
+    alert("✅ Cobro eliminado correctamente.");
+}
 
 /* =========================
    WHATSAPP COBRO
