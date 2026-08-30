@@ -465,7 +465,95 @@
         window.scrollTo(0, 0);
       }
     }
+    <!-- Scripts de Interacción y Navegación -->
+  <script>
+    // 1. Navegación entre pestañas
+    function mostrar(idSection) {
+      const secciones = document.querySelectorAll('main > section');
+      secciones.forEach(sec => sec.classList.add('hidden'));
+      
+      const destino = document.getElementById(idSection);
+      if (destino) {
+        destino.classList.remove('hidden');
+        window.scrollTo(0, 0);
+      }
+    }
+
+    // 2. Función para Agregar Cliente
+    function nuevoCliente() {
+      const nombre = prompt("Nombre del cliente:");
+      if (!nombre) return;
+      
+      const telefono = prompt("Teléfono del cliente (a 10 dígitos):") || "";
+      const direccion = prompt("Dirección del cliente:") || "";
+
+      // Recuperar clientes de localStorage
+      let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+      
+      const clienteNuevo = {
+        id: Date.now(),
+        nombre: nombre.trim(),
+        telefono: telefono.trim(),
+        direccion: direccion.trim()
+      };
+
+      clientes.push(clienteNuevo);
+      localStorage.setItem('clientes', JSON.stringify(clientes));
+
+      alert("Cliente guardado correctamente.");
+
+      // Si App.js tiene una función para renderizar la lista, la ejecuta
+      if (typeof renderizarClientes === "function") {
+        renderizarClientes();
+      } else if (typeof cargarClientes === "function") {
+        cargarClientes();
+      } else {
+        location.reload(); // Recarga ligera para actualizar selectores si es necesario
+      }
+    }
+
+    // 3. Función para Compartir por WhatsApp
+    function compartirWhatsApp() {
+      const clienteSelect = document.getElementById('clienteSeleccionado');
+      const clienteNombre = clienteSelect ? clienteSelect.options[clienteSelect.selectedIndex]?.text : "Cliente";
+      const total = document.getElementById('totalFinal')?.innerText || document.getElementById('total')?.innerText || "$0.00";
+      const saldo = document.getElementById('saldo')?.innerText || "$0.00";
+
+      // Intentar obtener el teléfono del cliente guardado en localStorage
+      let telefono = "";
+      let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+      let clienteActual = clientes.find(c => c.nombre === clienteNombre || c.id == clienteSelect?.value);
+      
+      if (clienteActual && clienteActual.telefono) {
+        telefono = clienteActual.telefono.replace(/\D/g, ''); // Limpiar caracteres no numéricos
+      }
+
+      // Si no hay teléfono registrado, solicitarlo en el momento
+      if (!telefono) {
+        const telIngresado = prompt("Ingresa el número de WhatsApp del cliente (10 dígitos):");
+        if (!telIngresado) return;
+        telefono = telIngresado.replace(/\D/g, '');
+      }
+
+      // Construcción del mensaje
+      let mensaje = `Hola *${clienteNombre}*, adjunto el resumen de la cotización:\n\n`;
+      mensaje += `*Total Presupuesto:* ${total}\n`;
+      mensaje += `*Saldo Pendiente:* ${saldo}\n\n`;
+      mensaje += `Quedo a tus órdenes para cualquier duda o confirmación. ⚡`;
+
+      const mensajeEncriptado = encodeURIComponent(mensaje);
+      const urlWhatsApp = `https://wa.me/${telefono}?text=${mensajeEncriptado}`;
+
+      // Abrir WhatsApp en pestaña nueva o aplicación
+      window.open(urlWhatsApp, '_blank');
+    }
   </script>
+
+  <!-- Script Lógico Principal -->
+  <script src="App.js"></script>
+</body>
+</html>
+
 
   <!-- Script Lógico de la aplicación -->
   <script src="App.js"></script>
