@@ -453,7 +453,21 @@
     <button onclick="mostrar('cobros')"><span>💰</span>Cobros</button>
   </nav>
 
-  <!-- Script Lógico Único Externo -->
+  <!-- Script de navegación universal -->
+  <script>
+    function mostrar(idSection) {
+      const secciones = document.querySelectorAll('main > section');
+      secciones.forEach(sec => sec.classList.add('hidden'));
+      
+      const destino = document.getElementById(idSection);
+      if (destino) {
+        destino.classList.remove('hidden');
+        window.scrollTo(0, 0);
+      }
+    }
+  </script>
+
+  <!-- Script Lógico de la aplicación -->
   <script src="App.js"></script>
 </body>
 </html>
