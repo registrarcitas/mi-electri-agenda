@@ -345,7 +345,7 @@
       <div class="card">
         <h2>Cotizador</h2>
         <div class="form-group">
-          <label>Cliente</label>
+          <label>Seleccionar Cliente para la Cotización</label>
           <select id="clienteSeleccionado" onchange="cargarDatosClienteCotizacion()"></select>
         </div>
         <div id="datosCliente"></div>
@@ -460,7 +460,7 @@
     <button onclick="mostrar('cobros')"><span>💰</span>Cobros</button>
   </nav>
 
-  <!-- MOTOR LÓGICO Y CONTROLADOR INTERNO (ROBUSTO Y COMPLETO) -->
+  <!-- MOTOR LÓGICO Y CONTROLADOR INTERNO -->
   <script>
     // --- ESTADO DE LA APLICACIÓN ---
     let db = {
@@ -725,23 +725,31 @@
       alert("Cotización guardada exitosamente.");
     }
 
+    // --- ENVIAR POR WHATSAPP CON SELECCIÓN AUTOMÁTICA O PROMPT ---
     function compartirWhatsApp() {
       const clienteId = document.getElementById('clienteSeleccionado').value;
-      const cliente = db.clientes.find(c => c.id == clienteId);
+      let cliente = db.clientes.find(c => c.id == clienteId);
+      let tel = "";
+
+      // Si hay un cliente seleccionado en la lista, usamos su número registrado
+      if (cliente && cliente.telefono) {
+        tel = cliente.telefono.replace(/\D/g, '');
+      }
+
+      // Si no hay cliente seleccionado o no tiene teléfono registrado, pedimos ingresar uno
+      if (!tel) {
+        const telIngresado = prompt("Selecciona un cliente en la lista superior o ingresa el número (10 dígitos):");
+        if (!telIngresado) return;
+        tel = telIngresado.replace(/\D/g, '');
+      }
+
       const total = document.getElementById('totalFinal').innerText;
       const saldo = document.getElementById('saldo').innerText;
-
-      let tel = cliente ? cliente.telefono.replace(/\D/g, '') : '';
-      if (!tel) {
-        tel = prompt("Ingresa el teléfono de WhatsApp (10 dígitos):");
-        if (!tel) return;
-        tel = tel.replace(/\D/g, '');
-      }
 
       let msj = `Hola *${cliente ? cliente.nombre : 'Cliente'}*, envío el resumen de tu cotización:\n\n`;
       cotizacionActual.servicios.forEach(s => msj += `• ⚡ ${s.nombre} (x${s.cantidad}): $${s.subtotal.toFixed(2)}\n`);
       cotizacionActual.materiales.forEach(m => msj += `• 📦 ${m.nombre} (${m.cantidad} ${m.unidad}): $${m.subtotal.toFixed(2)}\n`);
-      msj += `\n*Total:* ${total}\n*Saldo Pendiente:* ${saldo}\n\nQuedo a tus órdenes.`;
+      msj += `\n*Total:* ${total}\n*Saldo Pendiente:* ${saldo}\n\nQuedo a tus órdenes.⚡`;
 
       window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msj)}`, '_blank');
     }
