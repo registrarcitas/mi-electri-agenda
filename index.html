@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+     
+<link rel="manifest" href="manifest.json">
+
+<title>Mi Electri-Agenda</title>
+
+<style>
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f1f5f9;
+color:#0f172a;
+min-height:100vh;
+padding-bottom:75px;
+}
+
+header{
+background:#0f172a;
+color:white;
+padding:20px;
+text-align:center;
+position:sticky;
+top:0;
+z-index:10;
+}
+
+header h1{
+font-size:24px;
+}
+
+header p{
+color:#cbd5e1;
+font-size:13px;
+margin-top:5px;
+}
+
+main{
+max-width:650px;
+margin:auto;
+padding:16px;
+}
+
+.hidden{
+display:none!important;
+}
+
+.card{
+background:white;
+border-radius:16px;
+padding:16px;
+margin-bottom:14px;
+box-shadow:0 2px 8px #0001;
+}
+
+h2{
+font-size:19px;
+margin-bottom:14px;
+}
+
+h3{
+margin-bottom:6px;
+}
+
+input,
+select,
+textarea{
+width:100%;
+padding:13px;
+border:1px solid #cbd5e1;
+border-radius:10px;
+font-size:16px;
+margin-bottom:10px;
+background:white;
+}
+
+textarea{
+min-height:100px;
+resize:vertical;
+}
+
+button{
+border:0;
+border-radius:10px;
+padding:12px 15px;
+font-weight:bold;
+font-size:15px;
+cursor:pointer;
+}
+
+.primary{
+background:#2563eb;
+color:white;
+}
+
+.success{
+background:#16a34a;
+color:white;
+}
+
+.dark{
+background:#0f172a;
+color:white;
+}
+
+.danger{
+background:#dc2626;
+color:white;
+}
+
+.gray{
+background:#e2e8f0;
+color:#0f172a;
+}
+
+.warning{
+background:#f59e0b;
+color:white;
+}
+
+.full{
+width:100%;
+margin-top:8px;
+}
+
+.menu{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.menu button{
+min-height:80px;
+font-size:16px;
+background:white;
+box-shadow:0 2px 8px #0001;
+}
+
+.total{
+background:#facc15;
+border-radius:18px;
+padding:20px;
+text-align:center;
+margin-bottom:14px;
+}
+
+.total small{
+color:#713f12;
+}
+
+.total strong{
+display:block;
+font-size:34px;
+margin-top:5px;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+}
+
+.item{
+border-bottom:1px solid #e2e8f0;
+padding:12px 0;
+}
+
+.item:last-child{
+border-bottom:0;
+}
+
+.item small{
+color:#64748b;
+}
+
+.price{
+font-weight:bold;
+color:#166534;
+}
+
+.actions{
+display:flex;
+gap:7px;
+margin-top:8px;
+flex-wrap:wrap;
+}
+
+.badge{
+display:inline-block;
+padding:5px 8px;
+background:#dbeafe;
+color:#1e40af;
+border-radius:8px;
+font-size:12px;
+}
+
+.badge-green{
+background:#dcfce7;
+color:#166534;
+}
+
+.badge-yellow{
+background:#fef3c7;
+color:#92400e;
+}
+
+.badge-red{
+background:#fee2e2;
+color:#991b1b;
+}
+
+.badge-gray{
+background:#e2e8f0;
+color:#475569;
+}
+
+.empty{
+text-align:center;
+color:#64748b;
+padding:20px;
+}
+
+.back{
+margin-bottom:12px;
+}
+
+.summary{
+border-top:2px solid #e2e8f0;
+margin-top:12px;
+padding-top:12px;
+}
+
+.summary div{
+display:flex;
+justify-content:space-between;
+padding:7px 0;
+}
+
+.final{
+font-size:22px;
+font-weight:bold;
+}
+
+.agenda-fecha{
+background:#eff6ff;
+border-left:4px solid #2563eb;
+padding:10px;
+border-radius:8px;
+margin-bottom:10px;
+}
+
+.info-box{
+background:#eff6ff;
+border:1px solid #bfdbfe;
+padding:12px;
+border-radius:10px;
+margin-bottom:12px;
+color:#1e3a8a;
+}
+
+.stock-box{
+background:#f8fafc;
+padding:10px;
+border-radius:10px;
+margin-top:8px;
+}
+
+.cobro-card{
+border-left:5px solid #2563eb;
+}
+
+.cobro-pendiente{
+border-left-color:#dc2626;
+}
+
+.cobro-parcial{
+border-left-color:#f59e0b;
+}
+
+.cobro-pagado{
+border-left-color:#16a34a;
+}
+
+.stat-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-bottom:14px;
+}
+
+.stat{
+background:white;
+padding:15px;
+border-radius:14px;
+box-shadow:0 2px 8px #0001;
+}
+
+.stat small{
+color:#64748b;
+}
+
+.stat strong{
+display:block;
+font-size:23px;
+margin-top:5px;
+}
+
+nav{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:white;
+border-top:1px solid #cbd5e1;
+display:flex;
+justify-content:space-around;
+padding:8px 4px;
+z-index:20;
+}
+
+nav button{
+background:none;
+padding:6px;
+font-size:12px;
+}
+
+hr{
+border:0;
+border-top:1px solid #e2e8f0;
+margin:12px 0;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>⚡ Mi Electri-Agenda</h1>
+<p>Agenda · Presupuestos · Cobros</p>
+</header>
+
+<main>
+
+<!-- =========================
+     INICIO
+========================= -->
+<section id="inicio">
+<div class="card">
+<h2>Buenos días 👋</h2>
+<p>¿Qué quieres hacer?</p>
+</div>
+
+<div class="menu">
+<button onclick="mostrar('cotizador')">🧾<br>Nuevo<br>presupuesto</button>
+<button onclick="mostrar('clientes')">👥<br>Clientes</button>
+<button onclick="mostrar('servicios')">🔧<br>Servicios</button>
+<button onclick="mostrar('materiales')">📦<br>Materiales</button>
+<button onclick="mostrar('agenda')">📅<br>Agenda</button>
+<button onclick="mostrar('cobros')">💰<br>Cobros</button>
+</div>
+</section>
+
+<!-- =========================
+     AGENDA
+========================= -->
+<section id="agenda" class="hidden">
+<button class="gray back" onclick="mostrar('inicio')">← Regresar</button>
+
+<div class="card">
+<h2>📅 Agenda</h2>
+<p>Programa tus trabajos y visitas.</p>
+</div>
+
+<div class="card">
+<h2>➕ Nuevo trabajo</h2>
+<select id="agendaCliente">
+<option value="">Seleccionar cliente</option>
+</select>
+<input id="agendaFecha" type="date">
+<input id="agendaHora" type="time">
+<input id="agendaTrabajo" placeholder="Trabajo a realizar">
+<textarea id="agendaNotas" placeholder="Notas del trabajo"></textarea>
+<button class="primary full" onclick="guardarTrabajo()">💾 Guardar trabajo</button>
+</div>
+     
+<div id="listaAgenda"></div>
+</section>
+
+<!-- =========================
+     CLIENTES
+========================= -->
+<section id="clientes" class="hidden">
+<button class="gray back" onclick="mostrar('inicio')">← Regresar</button>
+<div class="card">
+<h2>👥 Clientes</h2>
+<button class="primary full" onclick="nuevoCliente()">+ Nuevo cliente</button>
+</div>
+<div id="listaClientes"></div>
+</section>
+
+<!-- =========================
+     SERVICIOS
+========================= -->
+<section id="servicios" class="hidden">
+<button class="gray back" onclick="mostrar('inicio')">← Regresar</button>
+<div class="card">
+<h2>🔧 Servicios</h2>
+<input id="servNombre" placeholder="Nombre del servicio">
+<input id="servPrecio" type="number" step="0.01" placeholder="Precio de mano de obra">
+<button class="success full" onclick="agregarServicio()">+ Agregar servicio</button>
+</div>
+<div id="listaServicios"></div>
+</section>
+
+<!-- =========================
+     MATERIALES
+========================= -->
+<section id="materiales" class="hidden">
+<button class="gray back" onclick="mostrar('inicio')">← Regresar</button>
+
+<div class="card">
+<h2>📦 Materiales</h2>
+<div class="info-box">
+<strong>¿Cómo funciona?</strong><br><br>
+Ejemplo: compras una caja de cable de 100 metros por $850. El sistema calcula automáticamente el precio por metro y solo cobra los metros utilizados.
+</div>
+
+<input id="matNombre" placeholder="Nombre del material">
+
+<label>Unidad de uso</label>
+<select id="matUnidad">
+<option value="pieza">Pieza</option>
+<option value="metro">Metro</option>
+<option value="litro">Litro</option>
+<option value="kilogramo">Kilogramo</option>
+<option value="caja">Caja</option>
+<option value="rollo">Rollo</option>
+<option value="paquete">Paquete</option>
+<option value="otro">Otro</option>
+</select>
+
+<input id="matContenido" type="number" step="0.01" value="1" min="0.01" placeholder="Contenido de la presentación">
+<input id="matCosto" type="number" step="0.01" placeholder="Costo de compra de la presentación">
+<input id="matMargen" type="number" step="0.01" value="20" placeholder="Margen de ganancia %">
+<input id="matStock" type="number" step="0.01" value="0" min="0" placeholder="Cantidad disponible">
+
+<button class="success full" onclick="agregarMaterialCatalogo()">+ Agregar material</button>
+</div>
+
+<div id="listaMateriales"></div>
+</section>
+
+<!-- =========================
+     COTIZADOR
+========================= -->
+<section id="cotizador" class="hidden">
+<button class="gray back" onclick="mostrar('inicio')">← Regresar</button>
+
+<div class="total">
+<small>TOTAL DEL PRESUPUESTO</small>
+<strong id="total">$0.00</strong>
+</div>
+
+<div class="card">
+<h2>👤 Cliente</h2>
+<select id="clienteSeleccionado" onchange="cargarClienteCotizacion()">
+<option value="">Seleccionar cliente</option>
+</select>
+<div id="datosCliente"></div>
+</div>
+
+<div class="card">
+<h2>🔧 Agregar servicio</h2>
+<select id="servicioSeleccionado">
+<option value="">Seleccionar servicio</option>
+</select>
+<input id="cantidadServicio" type="number" value="1" min="1" step="1" placeholder="Cantidad">
+<button class="primary full" onclick="agregarServicioCotizacion()">+ Agregar servicio</button>
+</div>
+
+<div class="card">
+<h2>📦 Agregar material</h2>
+<select id="materialSeleccionado" onchange="mostrarInfoMaterialCotizacion()">
+<option value="">Seleccionar material</option>
+</select>
+<div id="infoMaterialCotizacion"></div>
+<input id="cantidadMaterial" type="number" value="1" min="0.01" step="0.01" placeholder="Cantidad utilizada">
+<button class="primary full" onclick="agregarMaterialCotizacion()">+ Agregar material</button>
+</div>
+
+<div class="card">
+<h2>🧾 Conceptos</h2>
+<div id="conceptos">
+<div class="empty">No hay conceptos agregados.</div>
+</div>
+
+<div class="summary">
+<div><span>Mano de obra</span><strong id="subtotalServicios">$0.00</strong></div>
+<div><span>Materiales</span><strong id="subtotalMateriales">$0.00</strong></div>
+<div class="final"><span>TOTAL</span><strong id="totalFinal">$0.00</strong></div>
+</div>
+</div>
+
+<div class="card">
+<h2>💰 Pago inicial</h2>
+<input id="anticipo" type="number" step="0.01" min="0" placeholder="Anticipo">
+<div class="summary">
+<div class="final"><span>Saldo</span><strong id="saldo">$0.00</strong></div>
+</div>
+</div>
+
+<button class="success full" onclick="guardarPresupuesto()">💾 Guardar presupuesto</button>
+<button class="dark full" onclick="compartirWhatsApp()">📲 Compartir por WhatsApp</button>
+</section>
+
+<!-- =========================
+     COBROS
+========================= -->
+<section id="cobros" class="hidden">
+<button class="gray back" onclick="mostrar('inicio')">← Regresar</button>
+
+<div class="card">
+<h2>💰 Cobros</h2>
+<p>Control de anticipos, pagos y saldos.</p>
+</div>
+
+<div class="stat-grid">
+<div class="stat">
+<small>Por cobrar</small>
+<strong id="totalPorCobrar">$0.00</strong>
+</div>
+<div class="stat">
+<small>Cobrado</small>
+<strong id="totalCobrado">$0.00</strong>
+</div>
+</div>
+
+<div id="listaCobros"></div>
+</section>
+
+</main>
+
+<!-- =========================
+     NAVEGACIÓN
+========================= -->
+<nav>
+<button onclick="mostrar('inicio')">🏠<br>Inicio</button>
+<button onclick="mostrar('clientes')">👥<br>Clientes</button>
+<button onclick="mostrar('cotizador')">🧾<br>Cotizar</button>
+<button onclick="mostrar('cobros')">💰<br>Cobros</button>
+<button onclick="mostrar('servicios')">🔧<br>Servicios</button>
+</nav>
+
+<script>
+/* =========================
+   DATOS
+========================= */
+let clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
+let servicios = JSON.parse(localStorage.getItem("servicios") || "[]");
+let materiales = JSON.parse(localStorage.getItem("materiales") || "[]");
+let trabajos = JSON.parse(localStorage.getItem("agenda") || "[]");
+let presupuestos = JSON.parse(localStorage.getItem("presupuestos") || "[]");
+let conceptos = [];
+
+/* =========================
+   DATOS INICIALES
+========================= */
+if(servicios.length === 0){
+  servicios = [
+    {id:Date.now()+1, nombre:"Contacto", precio:250},
+    {id:Date.now()+2, nombre:"Apagador", precio:250},
+    {id:Date.now()+3, nombre:"Lámpara", precio:450},
+    {id:Date.now()+4, nombre:"Circuito 120 V", precio:1500},
+    {id:Date.now()+5, nombre:"Circuito 220 V", precio:2000},
+    {id:Date.now()+6, nombre:"Diagnóstico", precio:500}
+  ];
+  guardarDatos();
+}
+
+/* =========================
+   NAVEGACIÓN
+========================= */
+function mostrar(id){
+  document.querySelectorAll("main > section").forEach(s=>s.classList.add("hidden"));
+  const seccion = document.getElementById(id);
+  if(!seccion) return;
+  
+  seccion.classList.remove("hidden");
+
+  if(id==="clientes") mostrarClientes();
+  if(id==="servicios") mostrarServicios();
+  if(id==="materiales") mostrarMateriales();
+  if(id==="cotizador") prepararCotizador();
+  if(id==="agenda") prepararAgenda();
+  if(id==="cobros") mostrarCobros();
+
+  window.scrollTo(0,0);
+}
+
+/* =========================
+   GUARDAR DATOS
+========================= */
+function guardarDatos(){
+  localStorage.setItem("clientes", JSON.stringify(clientes));
+  localStorage.setItem("servicios", JSON.stringify(servicios));
+  localStorage.setItem("materiales", JSON.stringify(materiales));
+  localStorage.setItem("agenda", JSON.stringify(trabajos));
+  localStorage.setItem("presupuestos", JSON.stringify(presupuestos));
+}
+
+/* =========================
+   AGENDA
+========================= */
+function prepararAgenda(){
+  const select = document.getElementById("agendaCliente");
+  select.innerHTML=`<option value="">Seleccionar cliente</option>`;
+  clientes.forEach(c=>{
+    select.innerHTML+=`<option value="${c.id}">${escapeHTML(c.nombre)}</option>`;
+  });
+  mostrarAgenda();
+}
+
+function guardarTrabajo(){
+  const clienteId = parseInt(document.getElementById("agendaCliente").value);
+  const fecha = document.getElementById("agendaFecha").value;
+  const hora = document.getElementById("agendaHora").value;
+  const trabajo = document.getElementById("agendaTrabajo").value.trim();
+  const notas = document.getElementById("agendaNotas").value.trim();
+
+  if(!clienteId){ alert("Selecciona un cliente."); return; }
+  if(!fecha){ alert("Selecciona una fecha."); return; }
+  if(!hora){ alert("Selecciona una hora."); return; }
+  if(!trabajo){ alert("Escribe el trabajo a realizar."); return; }
+
+  trabajos.push({
+    id:Date.now(),
+    clienteId,
+    fecha,
+    hora,
+    trabajo,
+    notas,
+    estado:"pendiente"
+  });
+
+  guardarDatos();
+  alert("✅ Trabajo programado.");
+
+  document.getElementById("agendaCliente").value="";
+  document.getElementById("agendaFecha").value="";
+  document.getElementById("agendaHora").value="";
+  document.getElementById("agendaTrabajo").value="";
+  document.getElementById("agendaNotas").value="";
+
+  mostrarAgenda();
+}
+
+function mostrarAgenda(){
+  const cont = document.getElementById("listaAgenda");
+  if(!cont) return;
+
+  if(trabajos.length===0){
+    cont.innerHTML=`<div class="card empty">No tienes trabajos programados.</div>`;
+    return;
+  }
+
+  const ordenados = [...trabajos].sort((a,b)=>( (a.fecha||"")+(a.hora||"") ).localeCompare( (b.fecha||"")+(b.hora||"") ));
+  cont.innerHTML="";
+
+  ordenados.forEach(t=>{
+    const cliente = clientes.find(c=>c.id===t.clienteId);
+    const div = document.createElement("div");
+    div.className="card";
+    div.innerHTML=`
+      <h3>📅 ${escapeHTML(t.trabajo)}</h3>
+      <div class="agenda-fecha">
+        <strong>${escapeHTML(t.fecha)}</strong><br>⏰ ${escapeHTML(t.hora)}
+      </div>
+      <p>👤 ${escapeHTML(cliente ? cliente.nombre : "Cliente eliminado")}</p>
+      ${cliente && cliente.telefono ? `<p>📞 ${escapeHTML(cliente.telefono)}</p>` : ""}
+      ${cliente && cliente.domicilio ? `<p>📍 ${escapeHTML(cliente.domicilio)}</p>` : ""}
+      ${t.notas ? `<p style="margin-top:8px">📝 ${escapeHTML(t.notas)}</p>` : ""}
+      <div class="actions">
+        ${cliente && cliente.domicilio ? `
+          <button class="dark" onclick="abrirMaps('${encodeURIComponent(cliente.domicilio)}')">🗺️ Maps</button>
+          <button class="dark" onclick="abrirWaze('${encodeURIComponent(cliente.domicilio)}')">🚗 Waze</button>
+        ` : ""}
+        <button class="success" onclick="marcarTrabajoTerminado(${t.id})">✓ Terminado</button>
+        <button class="danger" onclick="eliminarTrabajo(${t.id})">Eliminar</button>
+      </div>
+    `;
+    cont.appendChild(div);
+  });
+}
+
+function marcarTrabajoTerminado(id){
+  const t = trabajos.find(x=>x.id===id);
+  if(!t) return;
+  t.estado="terminado";
+  guardarDatos();
+  mostrarAgenda();
+}
+
+function eliminarTrabajo(id){
+  if(!confirm("¿Eliminar este trabajo?")) return;
+  trabajos = trabajos.filter(t=>t.id!==id);
+  guardarDatos();
+  mostrarAgenda();
+}
+
+/* =========================
+   CLIENTES
+========================= */
+function nuevoCliente(){
+  const nombre = prompt("Nombre del cliente:");
+  if(!nombre) return;
+  const telefono = prompt("Teléfono:");
+  const domicilio = prompt("Domicilio:");
+  const referencias = prompt("Referencias:");
+
+  clientes.push({
+    id:Date.now(),
+    nombre,
+    telefono,
+    domicilio,
+    referencias
+  });
+
+  guardarDatos();
+  mostrarClientes();
+}
+
+function mostrarClientes(){
+  const cont = document.getElementById("listaClientes");
+  if(clientes.length===0){
+    cont.innerHTML=`<div class="card empty">No tienes clientes todavía.</div>`;
+    return;
+  }
+
+  cont.innerHTML="";
+  clientes.forEach(c=>{
+    const div = document.createElement("div");
+    div.className="card";
+    div.innerHTML=`
+      <h3>${escapeHTML(c.nombre)}</h3>
+      <p>📞 ${escapeHTML(c.telefono||"")}</p>
+      <p>📍 ${escapeHTML(c.domicilio||"")}</p>
+      ${c.referencias ? `<p>📝 ${escapeHTML(c.referencias)}</p>` : ""}
+      <div class="actions">
+        <button class="primary" onclick="editarCliente(${c.id})">Editar</button>
+        <button class="danger" onclick="eliminarCliente(${c.id})">Eliminar</button>
+        <button class="dark" onclick="abrirMaps('${encodeURIComponent(c.domicilio||"")}')">🗺️ Maps</button>
+        <button class="dark" onclick="abrirWaze('${encodeURIComponent(c.domicilio||"")}')">🚗 Waze</button>
+      </div>
+    `;
+    cont.appendChild(div);
+  });
+}
+
+function editarCliente(id){
+  const c = clientes.find(x=>x.id===id);
+  if(!c) return;
+  const nombre = prompt("Nombre:", c.nombre);
+  if(!nombre) return;
+  c.nombre = nombre;
+  c.telefono = prompt("Teléfono:", c.telefono||"");
+  c.domicilio = prompt("Domicilio:", c.domicilio||"");
+  c.referencias = prompt("Referencias:", c.referencias||"");
+
+  guardarDatos();
+  mostrarClientes();
+}
+
+function eliminarCliente(id){
+  if(!confirm("¿Eliminar este cliente?")) return;
+  clientes = clientes.filter(c=>c.id!==id);
+  guardarDatos();
+  mostrarClientes();
+}
+
+/* =========================
+   SERVICIOS
+========================= */
+function agregarServicio(){
+  const nombre = document.getElementById("servNombre").value.trim();
+  const precio = parseFloat(document.getElementById("servPrecio").value);
+
+  if(!nombre || isNaN(precio) || precio<=0){
+    alert("Escribe nombre y precio.");
+    return;
+  }
+
+  servicios.push({
+    id:Date.now(),
+    nombre,
+    precio
+  });
+
+  guardarDatos();
+  document.getElementById("servNombre").value="";
+  document.getElementById("servPrecio").value="";
+  mostrarServicios();
+}
+
+function mostrarServicios(){
+  const cont = document.getElementById("listaServicios");
+  if(servicios.length===0){
+    cont.innerHTML=`<div class="card empty">No hay servicios.</div>`;
+    return;
+  }
+
+  cont.innerHTML="";
+  servicios.forEach(s=>{
+    const div = document.createElement("div");
+    div.className="card";
+    div.innerHTML=`
+      <div class="row">
+        <div>
+          <h3>${escapeHTML(s.nombre)}</h3>
+          <span class="badge">Mano de obra</span>
+        </div>
+        <div class="price">$${Number(s.precio).toFixed(2)}</div>
+      </div>
+      <div class="actions">
+        <button class="danger" onclick="eliminarServicio(${s.id})">Eliminar</button>
+      </div>
+    `;
+    cont.appendChild(div);
+  });
+}
+
+function eliminarServicio(id){
+  servicios = servicios.filter(s=>s.id!==id);
+  guardarDatos();
+  mostrarServicios();
+}
+
+/* =========================
+   MATERIALES
+========================= */
+function unidadTexto(unidad){
+  const mapa={
+    pieza:"pieza", metro:"metro", litro:"litro", kilogramo:"kg",
+    caja:"caja", rollo:"rollo", paquete:"paquete", otro:"unidad"
+  };
+  return mapa[unidad] || "unidad";
+}
+
+function agregarMaterialCatalogo(){
+  const nombre = document.getElementById("matNombre").value.trim();
+  const unidad = document.getElementById("matUnidad").value;
+  const contenido = parseFloat(document.getElementById("matContenido").value);
+  const costo = parseFloat(document.getElementById("matCosto").value);
+  const margen = parseFloat(document.getElementById("matMargen").value) || 0;
+  const stock = parseFloat(document.getElementById("matStock").value) || 0;
+
+  if(!nombre || isNaN(contenido) || contenido<=0 || isNaN(costo) || costo<=0){
+    alert("Completa nombre, contenido y costo.");
+    return;
+  }
+
+  const precioPresentacion = costo * (1 + margen/100);
+  const precioUnidad = precioPresentacion / contenido;
+
+  materiales.push({
+    id:Date.now(),
+    nombre,
+    unidad,
+    contenido,
+    costo,
+    margen,
+    precioPresentacion,
+    precioUnidad,
+    stock
+  });
+
+  guardarDatos();
+  document.getElementById("matNombre").value="";
+  document.getElementById("matContenido").value="1";
+  document.getElementById("matCosto").value="";
+  document.getElementById("matMargen").value="20";
+  document.getElementById("matStock").value="";
+
+  mostrarMateriales();
+}
+
+function mostrarMateriales(){
+  const cont = document.getElementById("listaMateriales");
+  if(materiales.length===0){
+    cont.innerHTML=`<div class="card empty">No hay materiales.</div>`;
+    return;
+  }
+
+  cont.innerHTML="";
+  materiales.forEach(m=>{
+    const contenido = Number(m.contenido)||1;
+    const precioUnidad = Number(m.precioUnidad || (Number(m.precio||0) / contenido));
+    const stock = Number(m.stock)||0;
+
+    const div = document.createElement("div");
+    div.className="card";
+    div.innerHTML=`
+      <div class="row">
+        <div>
+          <h3>${escapeHTML(m.nombre)}</h3>
+          <span class="badge">${escapeHTML(unidadTexto(m.unidad))}</span>
+        </div>
+        <div class="price">$${precioUnidad.toFixed(2)} / ${escapeHTML(unidadTexto(m.unidad))}</div>
+      </div>
+      <hr>
+      <p>📦 Presentación: <strong>${contenido} ${escapeHTML(unidadTexto(m.unidad))}</strong></p>
+      <p>💵 Costo: $${Number(m.costo||0).toFixed(2)}</p>
+      <p>📈 Margen: ${Number(m.margen||0).toFixed(2)}%</p>
+      <p>💰 Venta presentación: <strong>$${Number(m.precioPresentacion || (m.precio||0)).toFixed(2)}</strong></p>
+      <div class="stock-box">
+        📊 Existencia: <strong>${stock.toFixed(2)} ${escapeHTML(unidadTexto(m.unidad))}</strong>
+      </div>
+      <div class="actions">
+        <button class="danger" onclick="eliminarMaterial(${m.id})">Eliminar</button>
+      </div>
+    `;
+    cont.appendChild(div);
+  });
+}
+
+function eliminarMaterial(id){
+  materiales = materiales.filter(m=>m.id!==id);
+  guardarDatos();
+  mostrarMateriales();
+}
+
+/* =========================
+   COTIZADOR
+========================= */
+function prepararCotizador(){
+  const selectCliente = document.getElementById("clienteSeleccionado");
+  selectCliente.innerHTML=`<option value="">Seleccionar cliente</option>`;
+  clientes.forEach(c=>{
+    selectCliente.innerHTML+=`<option value="${c.id}">${escapeHTML(c.nombre)}</option>`;
+  });
+
+  const selectServicio = document.getElementById("servicioSeleccionado");
+  selectServicio.innerHTML=`<option value="">Seleccionar servicio</option>`;
+  servicios.forEach(s=>{
+    selectServicio.innerHTML+=`<option value="${s.id}">${escapeHTML(s.nombre)} - $${Number(s.precio).toFixed(2)}</option>`;
+  });
+
+  const selectMaterial = document.getElementById("materialSeleccionado");
+  selectMaterial.innerHTML=`<option value="">Seleccionar material</option>`;
+  materiales.forEach(m=>{
+    const precioUnidad = Number(m.precioUnidad || (Number(m.precio||0) / (Number(m.contenido)||1)));
+    selectMaterial.innerHTML+=`<option value="${m.id}">${escapeHTML(m.nombre)} - $${precioUnidad.toFixed(2)} / ${escapeHTML(unidadTexto(m.unidad))}</option>`;
+  });
+
+  mostrarInfoMaterialCotizacion();
+}
+
+function mostrarInfoMaterialCotizacion(){
+  const id = parseInt(document.getElementById("materialSeleccionado").value);
+  const div = document.getElementById("infoMaterialCotizacion");
+  if(!id){ div.innerHTML=""; return; }
+
+  const m = materiales.find(x=>x.id===id);
+  if(!m){ div.innerHTML=""; return; }
+
+  const unidad = unidadTexto(m.unidad);
+  const contenido = Number(m.contenido)||1;
+  const precioUnidad = Number(m.precioUnidad || (Number(m.precio||0) / contenido));
+  const stock = Number(m.stock)||0;
+
+  div.innerHTML=`
+    <div class="info-box">
+      <strong>${escapeHTML(m.nombre)}</strong><br><br>
+      Precio por ${escapeHTML(unidad)}: <strong>$${precioUnidad.toFixed(2)}</strong><br>
+      Existencia: <strong>${stock.toFixed(2)} ${escapeHTML(unidad)}</strong>
+    </div>
+  `;
+}
+
+function cargarClienteCotizacion(){
+  const id = parseInt(document.getElementById("clienteSeleccionado").value);
+  const c = clientes.find(x=>x.id===id);
+  const div = document.getElementById("datosCliente");
+
+  if(!c){ div.innerHTML=""; return; }
+
+  div.innerHTML=`
+    <div class="card">
+      <strong>${escapeHTML(c.nombre)}</strong>
+      <p>📞 ${escapeHTML(c.telefono||"")}</p>
+      <p>📍 ${escapeHTML(c.domicilio||"")}</p>
+      <div class="actions">
+        <button class="dark" onclick="abrirMaps('${encodeURIComponent(c.domicilio||"")}')">🗺️ Maps</button>
+        <button class="dark" onclick="abrirWaze('${encodeURIComponent(c.domicilio||"")}')">🚗 Waze</button>
+      </div>
+    </div>
+  `;
+}
+
+function agregarServicioCotizacion(){
+  const id = parseInt(document.getElementById("servicioSeleccionado").value);
+  const cantidad = parseFloat(document.getElementById("cantidadServicio").value) || 1;
+  const s = servicios.find(x=>x.id===id);
+
+  if(!s){ alert("Selecciona un servicio."); return; }
+
+  conceptos.push({
+    tipo:"servicio",
+    nombre:s.nombre,
+    precio:Number(s.precio),
+    cantidad
+  });
+
+  actualizarCotizacion();
+}
+
+function agregarMaterialCotizacion(){
+  const id = parseInt(document.getElementById("materialSeleccionado").value);
+  const cantidad = parseFloat(document.getElementById("cantidadMaterial").value) || 0;
+  const m = materiales.find(x=>x.id===id);
+
+  if(!m){ alert("Selecciona un material."); return; }
+  if(cantidad<=0){ alert("Indica una cantidad válida."); return; }
+
+  const unidad = unidadTexto(m.unidad);
+  const stock = Number(m.stock)||0;
+
+  if(stock>0 && cantidad>stock){
+    if(!confirm("Solo tienes "+stock.toFixed(2)+" "+unidad+". ¿Deseas continuar?")){
+      return;
+    }
+  }
+
+  const precioUnidad = Number(m.precioUnidad || (Number(m.precio||0) / (Number(m.contenido)||1)));
+
+  conceptos.push({
+    tipo:"material",
+    materialId:m.id,
+    nombre:m.nombre,
+    unidad:m.unidad,
+    precio:precioUnidad,
+    cantidad
+  });
+
+  actualizarCotizacion();
+}
+
+function actualizarCotizacion(){
+  const cont = document.getElementById("conceptos");
+  let manoObra=0;
+  let totalMateriales=0;
+
+  if(conceptos.length===0){
+    cont.innerHTML=`<div class="empty">No hay conceptos agregados.</div>`;
+  } else {
+    cont.innerHTML="";
+    conceptos.forEach((c,index)=>{
+      const subtotal = Number(c.precio) * Number(c.cantidad);
+      if(c.tipo==="servicio"){
+        manoObra+=subtotal;
+      } else {
+        totalMateriales+=subtotal;
+      }
+
+      const div = document.createElement("div");
+      div.className="item";
+      const unidad = c.tipo==="material" ? unidadTexto(c.unidad) : "";
+
+      div.innerHTML=`
+        <div class="row">
+          <div>
+            <strong>${escapeHTML(c.nombre)}</strong><br>
+            <small>${Number(c.cantidad).toFixed(2)} ${unidad} × $${Number(c.precio).toFixed(2)}</small>
+          </div>
+          <strong>$${subtotal.toFixed(2)}</strong>
+        </div>
+        <button class="danger" onclick="eliminarConcepto(${index})">Eliminar</button>
+      `;
+      cont.appendChild(div);
+    });
+  }
+
+  const total = manoObra + totalMateriales;
+  document.getElementById("subtotalServicios").textContent = "$"+manoObra.toFixed(2);
+  document.getElementById("subtotalMateriales").textContent = "$"+totalMateriales.toFixed(2);
+  document.getElementById("total").textContent = "$"+total.toFixed(2);
+  document.getElementById("totalFinal").textContent = "$"+total.toFixed(2);
+
+  calcularSaldo();
+}
+
+function eliminarConcepto(index){
+  conceptos.splice(index, 1);
+  actualizarCotizacion();
+}
+
+function calcularSaldo(){
+  const total = conceptos.reduce((sum,c)=>sum+(Number(c.precio)*Number(c.cantidad)),0);
+  const anticipo = parseFloat(document.getElementById("anticipo").value) || 0;
+  const saldo = Math.max(total-anticipo, 0);
+  document.getElementById("saldo").textContent = "$"+saldo.toFixed(2);
+}
+
+document.getElementById("anticipo").addEventListener("input", calcularSaldo);
+
+/* =========================
+   GUARDAR PRESUPUESTO
+========================= */
+function guardarPresupuesto(){
+  const clienteId = parseInt(document.getElementById("clienteSeleccionado").value);
+  if(!clienteId){ alert("Selecciona un cliente."); return; }
+  if(conceptos.length===0){ alert("Agrega al menos un concepto."); return; }
+
+  const anticipo = Math.max(parseFloat(document.getElementById("anticipo").value) || 0, 0);
+  const total = conceptos.reduce((sum,c)=>sum+(Number(c.precio)*Number(c.cantidad)),0);
+
+  if(anticipo>total){
+    alert("El anticipo no puede ser mayor al total.");
+    return;
+  }
+
+  conceptos.forEach(c=>{
+    if(c.tipo!=="material" || !c.materialId) return;
+    const m = materiales.find(x=>x.id===c.materialId);
+    if(!m) return;
+    const stock = Number(m.stock)||0;
+    if(stock>0){
+      m.stock = Math.max(stock - Number(c.cantidad), 0);
+    }
+  });
+
+  const presupuesto={
+    id:Date.now(),
+    clienteId,
+    conceptos: JSON.parse(JSON.stringify(conceptos)),
+    total,
+    anticipo,
+    saldo: Math.max(total-anticipo, 0),
+    pagos: anticipo>0 ? [{id:Date.now()+1, cantidad:anticipo, fecha:new Date().toLocaleString(), nota:"Anticipo"}] : [],
+    estado: anticipo>=total ? "pagado" : anticipo>0 ? "parcial" : "pendiente",
+    fecha: new Date().toLocaleString()
+  };
+
+  presupuestos.push(presupuesto);
+  guardarDatos();
+  mostrarMateriales();
+
+  alert("✅ Presupuesto guardado correctamente.");
+
+  conceptos=[];
+  document.getElementById("anticipo").value="";
+  actualizarCotizacion();
+}
+
+/* =========================
+   COBROS
+========================= */
+function obtenerEstadoPresupuesto(p){
+  const total = Number(p.total)||0;
+  const pagos = Array.isArray(p.pagos) ? p.pagos : (Number(p.anticipo)>0 ? [{cantidad:Number(p.anticipo), fecha:p.fecha, nota:"Anticipo"}] : []);
+  const cobrado = pagos.reduce((sum,pago)=>sum+(Number(pago.cantidad)||0),0);
+  const saldo = Math.max(total-cobrado, 0);
+
+  let estado="pendiente";
+  if(saldo<=0){
+    estado="pagado";
+  } else if(cobrado>0){
+    estado="parcial";
+  }
+
+  return { cobrado, saldo, estado };
+}
+
+function mostrarCobros(){
+  const cont = document.getElementById("listaCobros");
+
+  if(presupuestos.length===0){
+    cont.innerHTML=`
+      <div class="card empty">
+        No tienes presupuestos guardados todavía.<br><br>
+        Crea un presupuesto desde "Nuevo presupuesto".
+      </div>
+    `;
+    actualizarEstadisticasCobros();
+    return;
+  }
+
+  cont.innerHTML="";
+  const lista = [...presupuestos].reverse();
+
+  lista.forEach(p=>{
+    const cliente = clientes.find(c=>c.id===p.clienteId);
+    const info = obtenerEstadoPresupuesto(p);
+
+    let clase = "cobro-pendiente";
+    let badge = `<span class="badge badge-red">Pendiente</span>`;
+
+    if(info.estado==="parcial"){
+      clase="cobro-parcial";
+      badge=`<span class="badge badge-yellow">Pago parcial</span>`;
+    }
+
+    if(info.estado==="pagado"){
+      clase="cobro-pagado";
+      badge=`<span class="badge badge-green">Pagado</span>`;
+    }
+
+    const div = document.createElement("div");
+    div.className = "card cobro-card "+clase;
+    div.innerHTML=`
+      <div class="row">
+        <div>
+          <h3>${escapeHTML(cliente ? cliente.nombre : "Cliente eliminado")}</h3>
+          ${badge}
+        </div>
+        <strong>$${Number(p.total).toFixed(2)}</strong>
+      </div>
+      <hr>
+      <p>📅 ${escapeHTML(p.fecha||"")}</p>
+      <p style="margin-top:6px">💵 Cobrado: <strong>$${info.cobrado.toFixed(2)}</strong></p>
+      <p style="margin-top:6px">💰 Saldo: <strong>$${info.saldo.toFixed(2)}</strong></p>
+
+      <div class="actions">
+        ${info.saldo>0 ? `<button class="success" onclick="registrarPago(${p.id})">💵 Registrar pago</button>` : ""}
+        <button class="primary" onclick="verDetalleCobro(${p.id})">📋 Detalle</button>
+        <button class="dark" onclick="whatsappCobro(${p.id})">📲 WhatsApp</button>
+        <button class="danger" onclick="eliminarCobro(${p.id})">🗑️ Eliminar</button>
+      </div>
+
+      <div id="detalle-${p.id}" class="hidden" style="margin-top:12px">
+        ${generarDetallePagos(p)}
+      </div>
+    `;
+    cont.appendChild(div);
+  });
+
+  actualizarEstadisticasCobros();
+}
+
+function actualizarEstadisticasCobros(){
+  let cobrado=0;
+  let porCobrar=0;
+
+  presupuestos.forEach(p=>{
+    const info = obtenerEstadoPresupuesto(p);
+    cobrado+=info.cobrado;
+    porCobrar+=info.saldo;
+  });
+
+  document.getElementById("totalCobrado").textContent = "$"+cobrado.toFixed(2);
+  document.getElementById("totalPorCobrar").textContent = "$"+porCobrar.toFixed(2);
+}
+
+function generarDetallePagos(p){
+  const pagos = Array.isArray(p.pagos) ? p.pagos : [];
+  if(pagos.length===0){
+    return `<p class="empty">No hay pagos registrados.</p>`;
+  }
+
+  let html="";
+  pagos.forEach((pago,index)=>{
+    html+=`
+      <div class="item">
+        <div class="row">
+          <div>
+            <strong>Pago ${index+1}</strong><br>
+            <small>${escapeHTML(pago.fecha||"")}</small>
+          </div>
+          <strong>$${Number(pago.cantidad||0).toFixed(2)}</strong>
+        </div>
+        ${pago.nota ? `<small>${escapeHTML(pago.nota)}</small>` : ""}
+      </div>
+    `;
+  });
+  return html;
+}
+
+function verDetalleCobro(id){
+  const div = document.getElementById("detalle-"+id);
+  if(!div) return;
+  div.classList.toggle("hidden");
+}
+
+function registrarPago(id){
+  const p = presupuestos.find(x=>x.id===id);
+  if(!p) return;
+
+  const info = obtenerEstadoPresupuesto(p);
+  if(info.saldo<=0){
+    alert("Este presupuesto ya está pagado.");
+    return;
+  }
+
+  const cantidad = parseFloat(prompt("¿Cuánto pagó el cliente?\nSaldo actual: $"+info.saldo.toFixed(2)));
+  if(isNaN(cantidad) || cantidad<=0) return;
+
+  if(cantidad>info.saldo){
+    alert("El pago no puede ser mayor al saldo.");
+    return;
+  }
+
+  const nota = prompt("Nota del pago (opcional):") || "";
+
+  if(!Array.isArray(p.pagos)){ p.pagos=[]; }
+
+  p.pagos.push({
+    id:Date.now(),
+    cantidad,
+    fecha:new Date().toLocaleString(),
+    nota
+  });
+
+  const nuevo = obtenerEstadoPresupuesto(p);
+  p.anticipo = p.pagos.reduce((sum,pago)=>sum+Number(pago.cantidad||0),0);
+  p.saldo = nuevo.saldo;
+  p.estado = nuevo.estado;
+
+  guardarDatos();
+  mostrarCobros();
+  alert("✅ Pago registrado.");
+}
+
+function eliminarCobro(id){
+  const p = presupuestos.find(x => x.id === id);
+  if(!p) return;
+
+  const cliente = clientes.find(c => c.id === p.clienteId);
+  const nombreCliente = cliente ? cliente.nombre : "este cliente";
+
+  if(!confirm("¿Eliminar este cobro?\n\nCliente: " + nombreCliente + "\nTotal: $" + Number(p.total).toFixed(2) + "\n\nEsta acción no se puede deshacer.")){
+    return;
+  }
+
+  presupuestos = presupuestos.filter(x => x.id !== id);
+  guardarDatos();
+  mostrarCobros();
+  alert("✅ Cobro eliminado correctamente.");
+}
+
+/* =========================
+   WHATSAPP COBRO & PRESUPUESTO
+========================= */
+function whatsappCobro(id){
+  const p = presupuestos.find(x=>x.id===id);
+  if(!p) return;
+  const cliente = clientes.find(c=>c.id===p.clienteId);
+  if(!cliente){ alert("No se encontró el cliente."); return; }
+
+  const info = obtenerEstadoPresupuesto(p);
+  let mensaje = "⚡ Mi Electri-Agenda\n\n";
+  mensaje += "Hola "+cliente.nombre+", este es el estado de tu presupuesto:\n\n";
+  mensaje += "Total: $"+Number(p.total).toFixed(2)+"\n";
+  mensaje += "Pagado: $"+info.cobrado.toFixed(2)+"\n";
+  mensaje += "Saldo pendiente: $"+info.saldo.toFixed(2)+"\n";
+
+  if(info.estado==="pagado"){
+    mensaje += "\n✅ Presupuesto liquidado.";
+  } else {
+    mensaje += "\n💰 Pendiente de pago.";
+  }
+
+  window.open("https://wa.me/?text="+encodeURIComponent(mensaje), "_blank");
+}
+
+function compartirWhatsApp(){
+  const clienteId = parseInt(document.getElementById("clienteSeleccionado").value);
+  const cliente = clientes.find(c=>c.id===clienteId);
+
+  if(!cliente){ alert("Selecciona un cliente."); return; }
+  if(conceptos.length===0){ alert("Agrega al menos un concepto."); return; }
+
+  const total = conceptos.reduce((sum,c)=>sum+(Number(c.precio)*Number(c.cantidad)),0);
+
+  let mensaje = "⚡ Mi Electri-Agenda\n\nPresupuesto para: "+cliente.nombre+"\n\n";
+  conceptos.forEach(c=>{
+    const unidad = c.tipo==="material" ? unidadTexto(c.unidad) : "";
+    mensaje += c.nombre+" - "+Number(c.cantidad).toFixed(2)+" "+unidad+" = $"+(Number(c.precio)*Number(c.cantidad)).toFixed(2)+"\n";
+  });
+  mensaje += "\nTOTAL: $"+total.toFixed(2);
+
+  window.open("https://wa.me/?text="+encodeURIComponent(mensaje), "_blank");
+}
+
+/* =========================
+   MAPS & WAZE
+========================= */
+function abrirMaps(direccion){
+  if(!direccion){ alert("No hay domicilio registrado."); return; }
+  window.open("https://www.google.com/maps/search/?api=1&query="+direccion, "_blank");
+}
+
+function abrirWaze(direccion){
+  if(!direccion){ alert("No hay domicilio registrado."); return; }
+  window.open("https://www.waze.com/ul?q="+direccion+"&navigate=yes", "_blank");
+}
+
+/* =========================
+   SEGURIDAD
+========================= */
+function escapeHTML(text){
+  return String(text || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+/* =========================
+   INICIO
+========================= */
+mostrar("inicio");
+</script>
+
+</body>
+</html>
