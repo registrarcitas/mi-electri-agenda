@@ -534,7 +534,6 @@
         `).join('');
       }
 
-      // Actualizar combos
       const opciones = '<option value="">-- Selecciona un cliente --</option>' + 
         db.clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
       selectCot.innerHTML = opciones;
@@ -671,10 +670,10 @@
       const div = document.getElementById('conceptos');
       let html = '';
 
-      cotizacionActual.servicios.forEach((s, index) => {
+      cotizacionActual.servicios.forEach((s) => {
         html += `<div class="item-line"><span>⚡ ${s.nombre} (x${s.cantidad})</span><strong>$${s.subtotal.toFixed(2)}</strong></div>`;
       });
-      cotizacionActual.materiales.forEach((m, index) => {
+      cotizacionActual.materiales.forEach((m) => {
         html += `<div class="item-line"><span>📦 ${m.nombre} (${m.cantidad} ${m.unidad})</span><strong>$${m.subtotal.toFixed(2)}</strong></div>`;
       });
 
@@ -715,7 +714,7 @@
         fecha: new Date().toLocaleDateString(),
         total: total,
         anticipo: anticipo,
-        saldo: total - anticipo,
+        saldo: Math.max(0, total - anticipo),
         estado: (total - anticipo) <= 0 ? 'Pagado' : (anticipo > 0 ? 'Parcial' : 'Pendiente')
       });
 
@@ -800,6 +799,13 @@
       guardarDB();
     }
 
+    function eliminarCobro(id) {
+      if (confirm("¿Deseas eliminar este registro de cobro/cotización?")) {
+        db.cotizaciones = db.cotizaciones.filter(c => c.id !== id);
+        guardarDB();
+      }
+    }
+
     function renderizarCobros() {
       const cont = document.getElementById('listaCobros');
       let totalCobrado = 0;
@@ -823,12 +829,15 @@
             </div>
             <p>Total: <strong>$${c.total.toFixed(2)}</strong> | Cobrado: $${c.anticipo.toFixed(2)}</p>
             <p class="price">Saldo: $${c.saldo.toFixed(2)}</p>
-            ${c.saldo > 0 ? `<div class="actions"><button class="success" onclick="registrarPago(${c.id})">💵 Registrar Pago</button></div>` : ''}
+            <div class="actions">
+              ${c.saldo > 0 ? `<button class="success" onclick="registrarPago(${c.id})">💵 Registrar Pago</button>` : ''}
+              <button class="danger" onclick="eliminarCobro(${c.id})">Eliminar</button>
+            </div>
           </div>
         `).join('');
     }
 
-    // --- INITIALIZATION ---
+    // --- INICIALIZACIÓN ---
     function renderizarTodo() {
       renderizarClientes();
       renderizarServicios();
