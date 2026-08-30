@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
+
+  <title>Mi Electri-Agenda</title>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<header>
+  <h1>⚡ Mi Electri-Agenda</h1>
+  <p>Administración de negocio eléctrico</p>
+</header>
+
+<main>
+
+<!-- =====================================================
+     INICIO
+===================================================== -->
+
+<section id="inicio">
+
+  <div class="card welcome">
+    <h2>Buenos días 👋</h2>
+    <p>Administra clientes, trabajos, materiales, presupuestos y cobros.</p>
+  </div>
+
+  <div id="resumenInicio" class="stat-grid"></div>
+
+  <div class="menu">
+
+    <button onclick="mostrar('cotizador')">
+      🧾<br>Nuevo presupuesto
+    </button>
+
+    <button onclick="mostrar('clientes')">
+      👥<br>Clientes
+    </button>
+
+    <button onclick="mostrar('servicios')">
+      🔧<br>Servicios
+    </button>
+
+    <button onclick="mostrar('materiales')">
+      📦<br>Materiales
+    </button>
+
+    <button onclick="mostrar('agenda')">
+      📅<br>Agenda
+    </button>
+
+    <button onclick="mostrar('cobros')">
+      💰<br>Cobros
+    </button>
+
+    <button onclick="mostrar('historial')">
+      📊<br>Historial
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     CLIENTES
+===================================================== -->
+
+<section id="clientes" class="hidden">
+
+  <button class="gray back" onclick="mostrar('inicio')">
+    ← Regresar
+  </button>
+
+  <div class="card">
+
+    <h2>👥 Clientes</h2>
+
+    <button class="primary full" onclick="nuevoCliente()">
+      + Nuevo cliente
+    </button>
+
+  </div>
+
+  <div id="listaClientes"></div>
+
+</section>
+
+
+<!-- =====================================================
+     SERVICIOS
+===================================================== -->
+
+<section id="servicios" class="hidden">
+
+  <button class="gray back" onclick="mostrar('inicio')">
+    ← Regresar
+  </button>
+
+  <div class="card">
+
+    <h2>🔧 Servicios</h2>
+
+    <input
+      id="servNombre"
+      placeholder="Nombre del servicio"
+    >
+
+    <input
+      id="servPrecio"
+      type="number"
+      min="0"
+      step="0.01"
+      placeholder="Precio de mano de obra"
+    >
+
+    <button
+      class="success full"
+      onclick="agregarServicio()"
+    >
+      + Agregar servicio
+    </button>
+
+  </div>
+
+  <div id="listaServicios"></div>
+
+</section>
+
+
+<!-- =====================================================
+     MATERIALES
+===================================================== -->
+
+<section id="materiales" class="hidden">
+
+  <button class="gray back" onclick="mostrar('inicio')">
+    ← Regresar
+  </button>
+
+  <div class="card">
+
+    <h2>📦 Materiales e inventario</h2>
+
+    <p class="help">
+      Registra el costo de compra, cantidad que contiene el paquete
+      y unidad de medida. La aplicación calculará automáticamente
+      el precio de venta por unidad.
+    </p>
+
+    <input
+      id="matNombre"
+      placeholder="Ej. Cable THW calibre 12"
+    >
+
+    <label>Tipo de unidad</label>
+
+    <select id="matUnidad">
+
+      <option value="pieza">Pieza</option>
+      <option value="metro">Metro</option>
+      <option value="caja">Caja</option>
+      <option value="litro">Litro</option>
+      <option value="kilogramo">Kilogramo</option>
+      <option value="rollo">Rollo</option>
+      <option value="paquete">Paquete</option>
+      <option value="juego">Juego</option>
+      <option value="otro">Otra</option>
+
+    </select>
+
+    <label>Costo de compra</label>
+
+    <input
+      id="matCosto"
+      type="number"
+      min="0"
+      step="0.01"
+      placeholder="Ej. 850"
+    >
+
+    <label>Contenido del paquete</label>
+
+    <input
+      id="matCantidadBase"
+      type="number"
+      min="0.001"
+      step="0.001"
+      value="1"
+      placeholder="Ej. 100"
+    >
+
+    <small class="help">
+      Ejemplo: una caja de cable cuesta $850 y contiene 100 metros.
+    </small>
+
+    <label>Margen de ganancia (%)</label>
+
+    <input
+      id="matMargen"
+      type="number"
+      min="0"
+      step="0.1"
+      value="20"
+      placeholder="20"
+    >
+
+    <button
+      class="success full"
+      onclick="agregarMaterialCatalogo()"
+    >
+      + Agregar material
+    </button>
+
+  </div>
+
+  <div id="listaMateriales"></div>
+
+</section>
+
+
+<!-- =====================================================
+     COTIZADOR
+===================================================== -->
+
+<section id="cotizador" class="hidden">
+
+  <button class="gray back" onclick="mostrar('inicio')">
+    ← Regresar
+  </button>
+
+  <div class="total">
+
+    <small>TOTAL DEL PRESUPUESTO</small>
+
+    <strong id="total">$0.00</strong>
+
+  </div>
+
+
+  <!-- CLIENTE -->
+
+  <div class="card">
+
+    <h2>👤 Cliente</h2>
+
+    <select
+      id="clienteSeleccionado"
+      onchange="cargarClienteCotizacion()"
+    >
+      <option value="">
+        Seleccionar cliente
+      </option>
+    </select>
+
+    <div id="datosCliente"></div>
+
+  </div>
+
+
+  <!-- SERVICIO -->
+
+  <div class="card">
+
+    <h2>🔧 Mano de obra</h2>
+
+    <select id="servicioSeleccionado">
+
+      <option value="">
+        Seleccionar servicio
+      </option>
+
+    </select>
+
+    <input
+      id="cantidadServicio"
+      type="number"
+      min="1"
+      step="1"
+      value="1"
+      placeholder="Cantidad"
+    >
+
+    <button
+      class="primary full"
+      onclick="agregarServicioCotizacion()"
+    >
+      + Agregar servicio
+    </button>
+
+  </div>
+
+
+  <!-- MATERIAL -->
+
+  <div class="card">
+
+    <h2>📦 Material</h2>
+
+    <select id="materialSeleccionado">
+
+      <option value="">
+        Seleccionar material
+      </option>
+
+    </select>
+
+    <div id="infoMaterialSeleccionado"></div>
+
+    <input
+      id="cantidadMaterial"
+      type="number"
+      min="0.001"
+      step="0.001"
+      value="1"
+      placeholder="Cantidad utilizada"
+    >
+
+    <button
+      class="primary full"
+      onclick="agregarMaterialCotizacion()"
+    >
+      + Agregar material
+    </button>
+
+  </div>
+
+
+  <!-- CONCEPTOS -->
+
+  <div class="card">
+
+    <h2>🧾 Conceptos</h2>
+
+    <div id="conceptos">
+
+      <div class="empty">
+        No hay conceptos agregados.
+      </div>
+
+    </div>
+
+
+    <div class="summary">
+
+      <div>
+        <span>Mano de obra</span>
+        <strong id="subtotalServicios">$0.00</strong>
+      </div>
+
+      <div>
+        <span>Materiales</span>
+        <strong id="subtotalMateriales">$0.00</strong>
+      </div>
+
+      <div class="final">
+        <span>TOTAL</span>
+        <strong id="totalFinal">$0.00</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- PAGO INICIAL -->
+
+  <div class="card">
+
+    <h2>💰 Anticipo</h2>
+
+    <input
+      id="anticipo"
+      type="number"
+      min="0"
+      step="0.01"
+      value="0"
+      placeholder="Anticipo"
+      oninput="calcularSaldo()"
+    >
+
+    <div class="summary">
+
+      <div class="final">
+
+        <span>Saldo</span>
+
+        <strong id="saldo">
+          $0.00
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <button
+    class="success full"
+    onclick="guardarPresupuesto()"
+  >
+    💾 Guardar presupuesto
+  </button>
+
+
+  <button
+    class="dark full"
+    onclick="compartirWhatsApp()"
+  >
+    📲 Compartir por WhatsApp
+  </button>
+
+</section>
+
+
+<!-- =====================================================
+     AGENDA
+===================================================== -->
+
+<section id="agenda" class="hidden">
+
+  <button class="gray back" onclick="mostrar('inicio')">
+    ← Regresar
+  </button>
+
+  <div class="card">
+
+    <h2>📅 Agenda</h2>
+
+    <p>
+      Trabajos pendientes y terminados.
+    </p>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>➕ Programar trabajo</h2>
+
+    <select id="agendaCliente">
+
+      <option value="">
+        Seleccionar cliente
+      </option>
+
+    </select>
+
+    <input
+      id="agendaFecha"
+      type="date"
+    >
+
+    <input
+      id="agendaHora"
+      type="time"
+    >
+
+    <input
+      id="agendaTrabajo"
+      placeholder="Trabajo a realizar"
+    >
+
+    <textarea
+      id="agendaNotas"
+      placeholder="Notas"
+    ></textarea>
+
+    <button
+      class="primary full"
+      onclick="guardarTrabajo()"
+    >
+      💾 Guardar trabajo
+    </button>
+
+  </div>
+
+  <div id="listaAgenda"></div>
+
+</section>
+
+
+<!-- =====================================================
+     COBROS
+===================================================== -->
+
+<section id="cobros" class="hidden">
+
+  <button class="gray back" onclick="mostrar('inicio')">
+    ← Regresar
+  </button>
+
+  <div class="card">
+
+    <h2>💰 Cobros</h2>
+
+    <p>
+      Consulta saldos y registra abonos de clientes.
+    </p>
+
+  </div>
+
+  <div id="resumenCobros"></div>
+
+  <div id="listaCobros"></div>
+
+</section>
+
+
+<!-- =====================================================
+     HISTORIAL
+===================================================== -->
+
+<section id="historial" class="hidden">
+
+  <button class="gray back" onclick="mostrar('inicio')">
+    ← Regresar
+  </button>
+
+  <div id="listaHistorial"></div>
+
+</section>
+
+</main>
+
+
+<!-- =====================================================
+     NAVEGACIÓN
+===================================================== -->
+
+<nav>
+
+  <button onclick="mostrar('inicio')">
+    🏠<br>Inicio
+  </button>
+
+  <button onclick="mostrar('clientes')">
+    👥<br>Clientes
+  </button>
+
+  <button onclick="mostrar('cotizador')">
+    🧾<br>Cotizar
+  </button>
+
+  <button onclick="mostrar('agenda')">
+    📅<br>Agenda
+  </button>
+
+  <button onclick="mostrar('cobros')">
+    💰<br>Cobros
+  </button>
+
+</nav>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>
