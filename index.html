@@ -29,7 +29,7 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      padding-bottom: 70px;
+      padding-bottom: 75px;
     }
 
     header {
@@ -61,7 +61,7 @@
     nav button {
       background: none;
       border: none;
-      padding: 10px 4px;
+      padding: 8px 4px;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -133,6 +133,7 @@
       border-radius: 8px;
       font-size: 0.95rem;
       outline: none;
+      background: white;
     }
 
     input:focus, select:focus, textarea:focus {
@@ -239,6 +240,15 @@
       border-radius: 8px;
       margin-top: 12px;
     }
+
+    .item-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--border);
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -252,7 +262,7 @@
     <section id="inicio">
       <div class="card">
         <h2>Panel Principal</h2>
-        <p>Selecciona una opción en el menú inferior para gestionar tus clientes, realizar cotizaciones, organizar tu agenda o revisar tus cobros.</p>
+        <p>Selecciona una opción en el menú inferior para gestionar clientes, cotizaciones, agenda y cobros.</p>
       </div>
       <div class="card">
         <h3>Accesos Rápidos</h3>
@@ -268,7 +278,7 @@
       <div class="card">
         <div class="row">
           <h2>Clientes</h2>
-          <button class="primary actions" style="margin:0;" onclick="nuevoCliente()">+ Agregar</button>
+          <button class="btn primary actions" style="margin:0; width:auto;" onclick="nuevoCliente()">+ Agregar</button>
         </div>
       </div>
       <div id="listaClientes"></div>
@@ -280,10 +290,10 @@
         <h2>Nuevo Servicio (Mano de Obra)</h2>
         <div class="form-group">
           <label>Nombre del Servicio</label>
-          <input type="text" id="servNombre" placeholder="Ej. Instalación de Socket">
+          <input type="text" id="servNombre" placeholder="Ej. Instalación de Centro de Carga">
         </div>
         <div class="form-group">
-          <label>Precio Standard ($)</label>
+          <label>Precio Estándar ($)</label>
           <input type="number" id="servPrecio" placeholder="0.00">
         </div>
         <button class="btn primary" onclick="agregarServicio()">Guardar Servicio</button>
@@ -306,10 +316,7 @@
             <option value="pieza">Pieza</option>
             <option value="caja">Caja</option>
             <option value="rollo">Rollo</option>
-            <option value="litro">Litro</option>
-            <option value="kilogramo">Kg</option>
             <option value="paquete">Paquete</option>
-            <option value="otro">Otro</option>
           </select>
         </div>
         <div class="form-group">
@@ -318,7 +325,7 @@
         </div>
         <div class="form-group">
           <label>Costo de Compra ($)</label>
-          <input type="number" id="matCosto" placeholder="Costo total de la presentación">
+          <input type="number" id="matCosto" placeholder="Costo total del empaque">
         </div>
         <div class="form-group">
           <label>Margen de Ganancia (%)</label>
@@ -339,7 +346,7 @@
         <h2>Cotizador</h2>
         <div class="form-group">
           <label>Cliente</label>
-          <select id="clienteSeleccionado" onchange="cargarClienteCotizacion()"></select>
+          <select id="clienteSeleccionado" onchange="cargarDatosClienteCotizacion()"></select>
         </div>
         <div id="datosCliente"></div>
       </div>
@@ -350,7 +357,7 @@
           <select id="servicioSeleccionado"></select>
         </div>
         <div class="form-group">
-          <label>Cantidad / Horas</label>
+          <label>Cantidad / Unidades</label>
           <input type="number" id="cantidadServicio" value="1">
         </div>
         <button class="btn primary" onclick="agregarServicioCotizacion()">+ Agregar Servicio</button>
@@ -382,7 +389,7 @@
 
         <div class="form-group" style="margin-top:12px;">
           <label>Anticipo recibido ($)</label>
-          <input type="number" id="anticipo" placeholder="0.00">
+          <input type="number" id="anticipo" value="0" oninput="calcularTotalesCotizacion()">
         </div>
 
         <div class="total-box">
@@ -415,11 +422,11 @@
         </div>
         <div class="form-group">
           <label>Trabajo a realizar</label>
-          <input type="text" id="agendaTrabajo" placeholder="Ej. Cambio de centro de carga">
+          <input type="text" id="agendaTrabajo" placeholder="Ej. Instalación eléctrica general">
         </div>
         <div class="form-group">
           <label>Notas adicionales</label>
-          <textarea id="agendaNotas" rows="2" placeholder="Detalles de acceso, material a llevar, etc."></textarea>
+          <textarea id="agendaNotas" rows="2" placeholder="Detalles de acceso, material a llevar..."></textarea>
         </div>
         <button class="btn primary" onclick="guardarTrabajo()">Agendar Trabajo</button>
       </div>
@@ -453,25 +460,34 @@
     <button onclick="mostrar('cobros')"><span>💰</span>Cobros</button>
   </nav>
 
-  <!-- Script de navegación universal -->
+  <!-- MOTOR LÓGICO Y CONTROLADOR INTERNO (ROBUSTO Y COMPLETO) -->
   <script>
-    function mostrar(idSection) {
-      const secciones = document.querySelectorAll('main > section');
-      secciones.forEach(sec => sec.classList.add('hidden'));
-      
-      const destino = document.getElementById(idSection);
-      if (destino) {
-        destino.classList.remove('hidden');
-        window.scrollTo(0, 0);
-      }
+    // --- ESTADO DE LA APLICACIÓN ---
+    let db = {
+      clientes: JSON.parse(localStorage.getItem('db_clientes')) || [],
+      servicios: JSON.parse(localStorage.getItem('db_servicios')) || [],
+      materiales: JSON.parse(localStorage.getItem('db_materiales')) || [],
+      cotizaciones: JSON.parse(localStorage.getItem('db_cotizaciones')) || [],
+      agenda: JSON.parse(localStorage.getItem('db_agenda')) || []
+    };
+
+    let cotizacionActual = {
+      servicios: [],
+      materiales: []
+    };
+
+    function guardarDB() {
+      localStorage.setItem('db_clientes', JSON.stringify(db.clientes));
+      localStorage.setItem('db_servicios', JSON.stringify(db.servicios));
+      localStorage.setItem('db_materiales', JSON.stringify(db.materiales));
+      localStorage.setItem('db_cotizaciones', JSON.stringify(db.cotizaciones));
+      localStorage.setItem('db_agenda', JSON.stringify(db.agenda));
+      renderizarTodo();
     }
-    <!-- Scripts de Interacción y Navegación -->
-  <script>
-    // 1. Navegación entre pestañas
+
+    // --- NAVEGACIÓN ---
     function mostrar(idSection) {
-      const secciones = document.querySelectorAll('main > section');
-      secciones.forEach(sec => sec.classList.add('hidden'));
-      
+      document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
       const destino = document.getElementById(idSection);
       if (destino) {
         destino.classList.remove('hidden');
@@ -479,83 +495,349 @@
       }
     }
 
-    // 2. Función para Agregar Cliente
+    // --- CLIENTES ---
     function nuevoCliente() {
-      const nombre = prompt("Nombre del cliente:");
+      const nombre = prompt("Nombre completo del cliente:");
       if (!nombre) return;
-      
-      const telefono = prompt("Teléfono del cliente (a 10 dígitos):") || "";
-      const direccion = prompt("Dirección del cliente:") || "";
+      const telefono = prompt("Teléfono (10 dígitos):") || "";
+      const direccion = prompt("Dirección completa:") || "";
 
-      // Recuperar clientes de localStorage
-      let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-      
-      const clienteNuevo = {
-        id: Date.now(),
-        nombre: nombre.trim(),
-        telefono: telefono.trim(),
-        direccion: direccion.trim()
-      };
+      db.clientes.push({ id: Date.now(), nombre, telefono, direccion });
+      guardarDB();
+      alert("Cliente agregado con éxito.");
+    }
 
-      clientes.push(clienteNuevo);
-      localStorage.setItem('clientes', JSON.stringify(clientes));
+    function eliminarCliente(id) {
+      if (confirm("¿Deseas eliminar este cliente?")) {
+        db.clientes = db.clientes.filter(c => c.id !== id);
+        guardarDB();
+      }
+    }
 
-      alert("Cliente guardado correctamente.");
+    function renderizarClientes() {
+      const cont = document.getElementById('listaClientes');
+      const selectCot = document.getElementById('clienteSeleccionado');
+      const selectAge = document.getElementById('agendaCliente');
 
-      // Si App.js tiene una función para renderizar la lista, la ejecuta
-      if (typeof renderizarClientes === "function") {
-        renderizarClientes();
-      } else if (typeof cargarClientes === "function") {
-        cargarClientes();
+      if (db.clientes.length === 0) {
+        cont.innerHTML = `<div class="card empty">No hay clientes registrados.</div>`;
       } else {
-        location.reload(); // Recarga ligera para actualizar selectores si es necesario
+        cont.innerHTML = db.clientes.map(c => `
+          <div class="card">
+            <h3>${c.nombre}</h3>
+            <p>📞 ${c.telefono || 'Sin teléfono'}</p>
+            <p>📍 ${c.direccion || 'Sin dirección'}</p>
+            <div class="actions">
+              <button class="danger" onclick="eliminarCliente(${c.id})">Eliminar</button>
+            </div>
+          </div>
+        `).join('');
       }
+
+      // Actualizar combos
+      const opciones = '<option value="">-- Selecciona un cliente --</option>' + 
+        db.clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+      selectCot.innerHTML = opciones;
+      selectAge.innerHTML = opciones;
     }
 
-    // 3. Función para Compartir por WhatsApp
+    // --- SERVICIOS ---
+    function agregarServicio() {
+      const nombre = document.getElementById('servNombre').value.trim();
+      const precio = parseFloat(document.getElementById('servPrecio').value);
+      if (!nombre || isNaN(precio)) return alert("Ingresa un nombre y precio válido.");
+
+      db.servicios.push({ id: Date.now(), nombre, precio });
+      document.getElementById('servNombre').value = '';
+      document.getElementById('servPrecio').value = '';
+      guardarDB();
+    }
+
+    function eliminarServicio(id) {
+      db.servicios = db.servicios.filter(s => s.id !== id);
+      guardarDB();
+    }
+
+    function renderizarServicios() {
+      const cont = document.getElementById('listaServicios');
+      const selectCot = document.getElementById('servicioSeleccionado');
+
+      cont.innerHTML = db.servicios.length === 0 
+        ? `<div class="card empty">No hay servicios registrados.</div>`
+        : db.servicios.map(s => `
+          <div class="card row">
+            <div>
+              <h3>${s.nombre}</h3>
+              <p class="price">$${s.precio.toFixed(2)}</p>
+            </div>
+            <button class="danger actions" onclick="eliminarServicio(${s.id})">Eliminar</button>
+          </div>
+        `).join('');
+
+      selectCot.innerHTML = '<option value="">-- Selecciona Mano de Obra --</option>' +
+        db.servicios.map(s => `<option value="${s.id}">${s.nombre} - $${s.precio.toFixed(2)}</option>`).join('');
+    }
+
+    // --- MATERIALES ---
+    function agregarMaterialCatalogo() {
+      const nombre = document.getElementById('matNombre').value.trim();
+      const unidad = document.getElementById('matUnidad').value;
+      const contenido = parseFloat(document.getElementById('matContenido').value) || 1;
+      const costo = parseFloat(document.getElementById('matCosto').value);
+      const margen = parseFloat(document.getElementById('matMargen').value) || 0;
+      const stock = parseFloat(document.getElementById('matStock').value) || 0;
+
+      if (!nombre || isNaN(costo)) return alert("Completa los campos obligatorios.");
+
+      const costoUnitario = costo / contenido;
+      const precioVentaUnitario = costoUnitario * (1 + (margen / 100));
+
+      db.materiales.push({
+        id: Date.now(), nombre, unidad, contenido, costo, margen, stock,
+        precioUnitario: precioVentaUnitario
+      });
+
+      document.getElementById('matNombre').value = '';
+      document.getElementById('matCosto').value = '';
+      document.getElementById('matStock').value = '';
+      guardarDB();
+    }
+
+    function eliminarMaterial(id) {
+      db.materiales = db.materiales.filter(m => m.id !== id);
+      guardarDB();
+    }
+
+    function renderizarMateriales() {
+      const cont = document.getElementById('listaMateriales');
+      const selectCot = document.getElementById('materialSeleccionado');
+
+      cont.innerHTML = db.materiales.length === 0
+        ? `<div class="card empty">No hay materiales en inventario.</div>`
+        : db.materiales.map(m => `
+          <div class="card">
+            <div class="row">
+              <h3>${m.nombre}</h3>
+              <span class="price">$${m.precioUnitario.toFixed(2)} / ${m.unidad}</span>
+            </div>
+            <div class="stock-box row">
+              <span>Stock: ${m.stock} ${m.unidad}(s)</span>
+              <button class="danger actions" onclick="eliminarMaterial(${m.id})">Eliminar</button>
+            </div>
+          </div>
+        `).join('');
+
+      selectCot.innerHTML = '<option value="">-- Selecciona Material --</option>' +
+        db.materiales.map(m => `<option value="${m.id}">${m.nombre} ($${m.precioUnitario.toFixed(2)}/${m.unidad})</option>`).join('');
+    }
+
+    // --- COTIZADOR ---
+    function cargarDatosClienteCotizacion() {
+      const id = document.getElementById('clienteSeleccionado').value;
+      const cliente = db.clientes.find(c => c.id == id);
+      const div = document.getElementById('datosCliente');
+      div.innerHTML = cliente ? `<div class="info-box">📍 ${cliente.direccion || 'Sin dirección'} | 📞 ${cliente.telefono || 'Sin tel'}</div>` : '';
+    }
+
+    function mostrarInfoMaterialCotizacion() {
+      const id = document.getElementById('materialSeleccionado').value;
+      const m = db.materiales.find(mat => mat.id == id);
+      const div = document.getElementById('infoMaterialCotizacion');
+      div.innerHTML = m ? `<div class="info-box">Disponible: ${m.stock} ${m.unidad}(s) | Precio Venta: $${m.precioUnitario.toFixed(2)}</div>` : '';
+    }
+
+    function agregarServicioCotizacion() {
+      const id = document.getElementById('servicioSeleccionado').value;
+      const cant = parseFloat(document.getElementById('cantidadServicio').value) || 1;
+      const s = db.servicios.find(serv => serv.id == id);
+      if (!s) return alert("Selecciona un servicio.");
+
+      cotizacionActual.servicios.push({ nombre: s.nombre, cantidad: cant, subtotal: s.precio * cant });
+      renderizarResumenCotizacion();
+    }
+
+    function agregarMaterialCotizacion() {
+      const id = document.getElementById('materialSeleccionado').value;
+      const cant = parseFloat(document.getElementById('cantidadMaterial').value);
+      const m = db.materiales.find(mat => mat.id == id);
+      if (!m || isNaN(cant) || cant <= 0) return alert("Selecciona material y cantidad válida.");
+
+      cotizacionActual.materiales.push({ nombre: m.nombre, cantidad: cant, unidad: m.unidad, subtotal: m.precioUnitario * cant });
+      document.getElementById('cantidadMaterial').value = '';
+      renderizarResumenCotizacion();
+    }
+
+    function renderizarResumenCotizacion() {
+      const div = document.getElementById('conceptos');
+      let html = '';
+
+      cotizacionActual.servicios.forEach((s, index) => {
+        html += `<div class="item-line"><span>⚡ ${s.nombre} (x${s.cantidad})</span><strong>$${s.subtotal.toFixed(2)}</strong></div>`;
+      });
+      cotizacionActual.materiales.forEach((m, index) => {
+        html += `<div class="item-line"><span>📦 ${m.nombre} (${m.cantidad} ${m.unidad})</span><strong>$${m.subtotal.toFixed(2)}</strong></div>`;
+      });
+
+      div.innerHTML = html || '<p class="empty">Sin conceptos agregados</p>';
+      calcularTotalesCotizacion();
+    }
+
+    function calcularTotalesCotizacion() {
+      const totalServ = cotizacionActual.servicios.reduce((acc, i) => acc + i.subtotal, 0);
+      const totalMat = cotizacionActual.materiales.reduce((acc, i) => acc + i.subtotal, 0);
+      const totalGen = totalServ + totalMat;
+      const anticipo = parseFloat(document.getElementById('anticipo').value) || 0;
+      const saldo = totalGen - anticipo;
+
+      document.getElementById('subtotalServicios').innerText = `$${totalServ.toFixed(2)}`;
+      document.getElementById('subtotalMateriales').innerText = `$${totalMat.toFixed(2)}`;
+      document.getElementById('total').innerText = `$${totalGen.toFixed(2)}`;
+      document.getElementById('totalFinal').innerText = `$${totalGen.toFixed(2)}`;
+      document.getElementById('saldo').innerText = `$${saldo.toFixed(2)}`;
+    }
+
+    function guardarPresupuesto() {
+      const clienteId = document.getElementById('clienteSeleccionado').value;
+      const cliente = db.clientes.find(c => c.id == clienteId);
+      if (!cliente) return alert("Selecciona un cliente.");
+
+      const totalServ = cotizacionActual.servicios.reduce((acc, i) => acc + i.subtotal, 0);
+      const totalMat = cotizacionActual.materiales.reduce((acc, i) => acc + i.subtotal, 0);
+      const total = totalServ + totalMat;
+      const anticipo = parseFloat(document.getElementById('anticipo').value) || 0;
+
+      if (total <= 0) return alert("El presupuesto no tiene conceptos.");
+
+      db.cotizaciones.push({
+        id: Date.now(),
+        cliente: cliente.nombre,
+        clienteId: cliente.id,
+        fecha: new Date().toLocaleDateString(),
+        total: total,
+        anticipo: anticipo,
+        saldo: total - anticipo,
+        estado: (total - anticipo) <= 0 ? 'Pagado' : (anticipo > 0 ? 'Parcial' : 'Pendiente')
+      });
+
+      cotizacionActual = { servicios: [], materiales: [] };
+      document.getElementById('anticipo').value = 0;
+      renderizarResumenCotizacion();
+      guardarDB();
+      alert("Cotización guardada exitosamente.");
+    }
+
     function compartirWhatsApp() {
-      const clienteSelect = document.getElementById('clienteSeleccionado');
-      const clienteNombre = clienteSelect ? clienteSelect.options[clienteSelect.selectedIndex]?.text : "Cliente";
-      const total = document.getElementById('totalFinal')?.innerText || document.getElementById('total')?.innerText || "$0.00";
-      const saldo = document.getElementById('saldo')?.innerText || "$0.00";
+      const clienteId = document.getElementById('clienteSeleccionado').value;
+      const cliente = db.clientes.find(c => c.id == clienteId);
+      const total = document.getElementById('totalFinal').innerText;
+      const saldo = document.getElementById('saldo').innerText;
 
-      // Intentar obtener el teléfono del cliente guardado en localStorage
-      let telefono = "";
-      let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-      let clienteActual = clientes.find(c => c.nombre === clienteNombre || c.id == clienteSelect?.value);
-      
-      if (clienteActual && clienteActual.telefono) {
-        telefono = clienteActual.telefono.replace(/\D/g, ''); // Limpiar caracteres no numéricos
+      let tel = cliente ? cliente.telefono.replace(/\D/g, '') : '';
+      if (!tel) {
+        tel = prompt("Ingresa el teléfono de WhatsApp (10 dígitos):");
+        if (!tel) return;
+        tel = tel.replace(/\D/g, '');
       }
 
-      // Si no hay teléfono registrado, solicitarlo en el momento
-      if (!telefono) {
-        const telIngresado = prompt("Ingresa el número de WhatsApp del cliente (10 dígitos):");
-        if (!telIngresado) return;
-        telefono = telIngresado.replace(/\D/g, '');
-      }
+      let msj = `Hola *${cliente ? cliente.nombre : 'Cliente'}*, envío el resumen de tu cotización:\n\n`;
+      cotizacionActual.servicios.forEach(s => msj += `• ⚡ ${s.nombre} (x${s.cantidad}): $${s.subtotal.toFixed(2)}\n`);
+      cotizacionActual.materiales.forEach(m => msj += `• 📦 ${m.nombre} (${m.cantidad} ${m.unidad}): $${m.subtotal.toFixed(2)}\n`);
+      msj += `\n*Total:* ${total}\n*Saldo Pendiente:* ${saldo}\n\nQuedo a tus órdenes.`;
 
-      // Construcción del mensaje
-      let mensaje = `Hola *${clienteNombre}*, adjunto el resumen de la cotización:\n\n`;
-      mensaje += `*Total Presupuesto:* ${total}\n`;
-      mensaje += `*Saldo Pendiente:* ${saldo}\n\n`;
-      mensaje += `Quedo a tus órdenes para cualquier duda o confirmación. ⚡`;
-
-      const mensajeEncriptado = encodeURIComponent(mensaje);
-      const urlWhatsApp = `https://wa.me/${telefono}?text=${mensajeEncriptado}`;
-
-      // Abrir WhatsApp en pestaña nueva o aplicación
-      window.open(urlWhatsApp, '_blank');
+      window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msj)}`, '_blank');
     }
+
+    // --- AGENDA ---
+    function guardarTrabajo() {
+      const clienteId = document.getElementById('agendaCliente').value;
+      const cliente = db.clientes.find(c => c.id == clienteId);
+      const fecha = document.getElementById('agendaFecha').value;
+      const hora = document.getElementById('agendaHora').value;
+      const trabajo = document.getElementById('agendaTrabajo').value.trim();
+      const notas = document.getElementById('agendaNotas').value.trim();
+
+      if (!cliente || !fecha || !trabajo) return alert("Por favor completa cliente, fecha y trabajo.");
+
+      db.agenda.push({ id: Date.now(), cliente: cliente.nombre, fecha, hora, trabajo, notas });
+      document.getElementById('agendaTrabajo').value = '';
+      document.getElementById('agendaNotas').value = '';
+      guardarDB();
+      alert("Trabajo agendado.");
+    }
+
+    function eliminarAgenda(id) {
+      db.agenda = db.agenda.filter(a => a.id !== id);
+      guardarDB();
+    }
+
+    function renderizarAgenda() {
+      const cont = document.getElementById('listaAgenda');
+      cont.innerHTML = db.agenda.length === 0 
+        ? `<div class="card empty">No hay trabajos programados.</div>`
+        : db.agenda.map(a => `
+          <div class="card">
+            <h3>📅 ${a.fecha} ${a.hora ? 'a las ' + a.hora : ''}</h3>
+            <p><strong>Cliente:</strong> ${a.cliente}</p>
+            <p><strong>Trabajo:</strong> ${a.trabajo}</p>
+            ${a.notas ? `<p><em>${a.notas}</em></p>` : ''}
+            <div class="actions">
+              <button class="danger" onclick="eliminarAgenda(${a.id})">Completar / Eliminar</button>
+            </div>
+          </div>
+        `).join('');
+    }
+
+    // --- COBROS ---
+    function registrarPago(id) {
+      const cot = db.cotizaciones.find(c => c.id === id);
+      if (!cot) return;
+      const abono = parseFloat(prompt(`Saldo actual: $${cot.saldo.toFixed(2)}\nIngresa el monto pagado:`));
+      if (isNaN(abono) || abono <= 0) return;
+
+      cot.anticipo += abono;
+      cot.saldo = Math.max(0, cot.total - cot.anticipo);
+      cot.estado = cot.saldo === 0 ? 'Pagado' : 'Parcial';
+      guardarDB();
+    }
+
+    function renderizarCobros() {
+      const cont = document.getElementById('listaCobros');
+      let totalCobrado = 0;
+      let totalPorCobrar = 0;
+
+      db.cotizaciones.forEach(c => {
+        totalCobrado += c.anticipo;
+        totalPorCobrar += c.saldo;
+      });
+
+      document.getElementById('totalCobrado').innerText = `$${totalCobrado.toFixed(2)}`;
+      document.getElementById('totalPorCobrar').innerText = `$${totalPorCobrar.toFixed(2)}`;
+
+      cont.innerHTML = db.cotizaciones.length === 0
+        ? `<div class="card empty">No hay registro de cotizaciones ni cobros.</div>`
+        : db.cotizaciones.map(c => `
+          <div class="card cobro-card cobro-${c.estado.toLowerCase()}">
+            <div class="row">
+              <h3>${c.cliente}</h3>
+              <span class="badge ${c.estado === 'Pagado' ? 'badge-green' : (c.estado === 'Parcial' ? 'badge-yellow' : 'badge-red')}">${c.estado}</span>
+            </div>
+            <p>Total: <strong>$${c.total.toFixed(2)}</strong> | Cobrado: $${c.anticipo.toFixed(2)}</p>
+            <p class="price">Saldo: $${c.saldo.toFixed(2)}</p>
+            ${c.saldo > 0 ? `<div class="actions"><button class="success" onclick="registrarPago(${c.id})">💵 Registrar Pago</button></div>` : ''}
+          </div>
+        `).join('');
+    }
+
+    // --- INITIALIZATION ---
+    function renderizarTodo() {
+      renderizarClientes();
+      renderizarServicios();
+      renderizarMateriales();
+      renderizarAgenda();
+      renderizarCobros();
+    }
+
+    document.addEventListener('DOMContentLoaded', renderizarTodo);
   </script>
-
-  <!-- Script Lógico Principal -->
-  <script src="App.js"></script>
-</body>
-</html>
-
-
-  <!-- Script Lógico de la aplicación -->
-  <script src="App.js"></script>
 </body>
 </html>
